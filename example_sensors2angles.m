@@ -1,6 +1,6 @@
 % Example code for getting joint angle data from sensor angles
 % This will change based on personal computer location
-path_to_repository = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/code_manuscript/';
+path_to_repository = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/';
 
 %% Step one: identify a baseline period
 % Some of the calculations require a 'baseline' period when the hand is
