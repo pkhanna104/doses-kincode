@@ -1,0 +1,78 @@
+8/22 -- got sensor boards up and running. Reminder! need to use driveBAY utility to make sure they are numbered correctly. Then power cycle them to make sure the changes get encoded. 
+
+8/23 -- tried collecting dataset with L and R hand. Sensor locations: 
+
+lower arm -- 1
+upper arm -- 2
+palm -- 8
+thumb mcp/pip/tip -- 9,10,11
+index mcp/pip/tip -- 5,6,7
+
+DIP angles and PIP angles look ok, else looks like garbage; 
+
+8/24 -- figured out that sensor board with 5/6/7/8 was drifting in cubes after a while. Placing all sensors next to one another didn't render the 5/6/7/8 bunch properly. Replaced sensor board and made palm --> 8; Suspicious that palm angle was messing up index PIP, all wrist stuff. Recollect L/R data. Also noticed that: 
+a. Shoulder vert flex and horz flex are mislabeled; Doing vertical flexion actually modulates horiz and vis versa. Thus, dataset did the opposite motion for each shoulder horiz/vert. 
+b. For the palm extension/flexion, I accidentally did + = extension movements (since that made more sense to me)
+c. MCP = 90 is hard to get 
+d. Palm ext (+50) is hard to get 
+e. all shoulder angles are hard to measure properly. 
+
+8/25 -- plotted errors and identified angles that are 'raw sensor' angles instead of differences (prono + shoulder). These angles seem to have some sign errors? Tom's code had "abs" around them, going to try to see if that makes sense or not. Also implemented some circular angle differences (in error code) -- may also need this for palm flexion / abduction 
+
+CANT get 3 boards to stream! Ugh. Found an old email from Jenny that suggest this: 
+1. check each board independently by attaching transmitter to it (did that, looks fine)
+2. unattach / reattach syncing hardware (did that, didnt' seem to matter)
+3. Add 1 board at a time (trying that, seems like if sync cx is direct b/w 2 boards (non-T BNC) it always works reliably) 
+4. W/ all 3 boards on and connected and transmitter on the middle board (one w/ T) also seems to work reliably but matlab doesn't like this (could try renaming middle one to be master0)? Would have to swap 
+5. Trying T at top w/ transmitter --> this works! Put the "T" with the transmitter board I think? 
+
+Fixed palm abd / palm flexion calculations to be euler angles relative to lower arm sensor 
+
+Notes on postures for assessment; 
+hand: Palm inwards
+palm: Palm flat on table
+elbow:palm inwards 
+shoulder: arm at 90 angle down; 
+
+measured my own hand (L) only; made plots, going to try to bring in a couple folks next week; 
+
+8/26 -- re-read reviews; Going to try to use data from fingers/wrist/elbow to show across day reliability, accuracy, and precision;
+	--> 3 days in a row of L hand recordings (8-24, 8-25, 8-26)
+	--> today do 2x R hand recordings;  (8-24, 8-26-R, 8-26-R2) 
+	-- going to setup and collect L and R hand task data too
+		-- L: pk-8-26-L-task
+		-- R: pk-8-26-R
+	-- order of 8-26 data: 
+		-- 8-26, L hand measurements
+		-- SHIFT TO TABLE
+		-- 8-26-R, R hand measurements+task 
+		-- 8-26-L-task, L hand task 
+		-- 8-26-R2, 2nd R hand measurements
+			-- in this started measurements as L hand, need to change these to R hand
+	-- overall, impression that need to be computing relative elevation for all angles, not just wrist flex. E.g. I think it could help a lot with index MCP 
+	
+8/30 -- AV session; 
+Age: ~30
+Handedness: Right
+Glove: black -- same as ones I've been using
+Angle notes: 
+Task notes: Royally messed up timing for R hand task (think I got in a pattern of only marking when subject wasnt doing trials) 
+1:05pm start glove donning R hand, 1:55pm; 
+accidentally recorded data in (L) hand column, not (R) hand
+Difficult to do +30 shoulder roll
+
+9/1: AM: SB session
+Age: 25
+Handedness: Right hand dominant; 
+Glove: Black
+Right hand: accidentally recorded data w/o filename for first right handed so repeated again (hence) two states/data files. Use 2nd one; 
+Recorded video for both L and R (uploaded into dropbox folder)
+Object height sensor may have fallen off midway through R hand task 
+
+9/1; PM: FR session
+Age: 32
+Handedness:Right 
+Notes: during L task, some onsets not perfectly aligned; 
+during R task, some extra trials done before start cue (i.e. in inter-trial periods); 
+did left hand first, then right hand
+
