@@ -16,7 +16,7 @@ for i_s = 1:length(sessions)
         for a=1:length(angles)
             
             if and(j==1, a==1)
-                prt = 1; 
+                prt = 0; 
                 disp([ 'Starting session: ' sess ' Hand: ' hand]); 
             else
                 prt = 0; 

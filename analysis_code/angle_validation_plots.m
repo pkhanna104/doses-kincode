@@ -583,10 +583,7 @@ end
 %% Figures 5 -- error plots 
 
 % Figure of true and dmn errors 
-figure(1); % By subject 
-figure(2); 
-subplot(1, 2, 1); hold all; title('True err'); 
-subplot(1, 2, 2); hold all; title('Demean err'); 
+figure;%(1); % By subject 
 
 % List of hands 
 hands = fieldnames(angle_data.('Thumb_MCP')); 
@@ -598,7 +595,6 @@ jts_tru = {'Thumb MCP',...
      'Index MCP',... 
     'Palm Flex',...
     'Palm Abd',...
-    'Palm Prono',...
     'Elbow Flex'};
 
 cmap = {[215,25,28]/255,...
@@ -685,7 +681,10 @@ for i_h = 1:length(hands)
     ylim([-30, 30])
 end
 
-figure(2); 
+figure('Position', [10 10 1000 400]); hold all
+subplot(1, 2, 1); hold all; title('True err'); 
+subplot(1, 2, 2); hold all; title('Demean err'); 
+
 tru_cnt = 0;
 
 xlab0 = {}; 
@@ -718,7 +717,7 @@ xticks(1:tru_cnt)
 xticklabels(xlab0)
 xtickangle(90)
 ax = gca(); 
-ax.XAxis.FontSize = 10; 
+ax.XAxis.FontSize = 14; 
 ylim([-30, 30])
 ylabel('Error (deg)');
 
@@ -727,7 +726,7 @@ xticks(1:length(jts))
 xticklabels(xlab)
 xtickangle(90)
 ax = gca(); 
-ax.XAxis.FontSize = 10; 
+ax.XAxis.FontSize = 14; 
 ylim([-30, 30])
 ylabel('Error (deg)');
     
