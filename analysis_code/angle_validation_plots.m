@@ -2,8 +2,8 @@
 % Pooling over (L/R hand), (days) measurements, show individual measurement
 % vs. session mean is reliable
 % Now combining over non-pk subjects from 
-jts = {'Thumb MCP', % dot product
-    'Thumb DIP', % dot product
+jts = {'Thumb DIP', % dot product
+    'Thumb MCP', % dot product
     'Index DIP', % dot product
     'Index PIP', % dot product
     'Index MCP', % dot product
@@ -11,9 +11,22 @@ jts = {'Thumb MCP', % dot product
     'Palm Abd', % angle diff
     'Palm Prono', % abs angle **
     'Elbow Flex', % dot product % 
-    'Shoulder Roll', % abs angle ** 
+    %'Shoulder Roll', % abs angle ** 
     'Shoulder VertFlex', % abs angle ** 
     'Shoulder HorzFlex'}; % abs angle **
+
+jt_names = {'Thumb IP', % dot product
+    'Thumb MCP', % dot product
+    'Index DIP', % dot product
+    'Index PIP', % dot product
+    'Index MCP', % dot product
+    'Wrist Flex/Ext', % angle diff
+    'Wrist Abd/Add', % angle diff
+    'Forearm Sup/Prono', % abs angle **
+    'Elbow Flex/Ext', % dot product % 
+    %'Shoulder Roll', % abs angle ** 
+    'Shoulder Flex/Ext', % abs angle ** 
+    'Shoulder Abd/Add'}; % abs angle **
 
 sessions = {'av-8-30-22-R-edited', 'av-8-30-22-L',...
     'fr-9-1-22-L', 'fr-9-1-22-R','sb-9-1-22-L','sb-9-1-22-R',...
@@ -26,10 +39,11 @@ baseline_fnames = {'task_baselines/av-R-baseline.mat', 'task_baselines/av-L-base
                    'task_baselines/sb-L-baseline.mat', 'task_baselines/sb-R-baseline.mat',...
                    'task_baselines/pk-8-26-R-baseline.mat'}; 
 
-path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/code_manuscript/data/healthy_controls/';
+path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/data/healthy_controls_goniometer/';
 
 %% Figure 1; across all sessions -- within-session reliability
-figure; hold all
+
+figure('Position', [10 10 600 400]); hold all
 
 xoff = 1;
 xlab = {};
@@ -51,7 +65,7 @@ for j=1:length(jts)
         data = data.data;
         
         hd = hand{s};
-        baseline_fname = [get_angle_data_w_planes baseline_fnames{s}]; 
+        baseline_fname = [path_to_data baseline_fnames{s}]; 
         
         for a=1:length(angles)
             
@@ -75,8 +89,8 @@ for j=1:length(jts)
     h = bar(xoff, mean(jt_error)); hold all; 
     set(h,'FaceColor',[150, 150, 150]/255);
     errorbar(xoff, mean(jt_error), std(jt_error), 'color','k')
-    newjt2 = strrep(newjt, '_', ' '); 
-    xlab{end+1} = newjt2;
+    %newjt2 = strrep(newjt, '_', ' '); 
+    xlab{end+1} = jt_names{xoff};
     xoff = xoff + 1;
     
 end
@@ -111,6 +125,7 @@ jts = {'Thumb MCP', % dot product
     'Palm Abd', % angle diff
     %'Palm Prono', % abs angle **
     'Elbow Flex'};
+
 jt_error = struct();
 jt_error_dmn = struct();
 
@@ -355,7 +370,7 @@ baseline_fnames = {'task_baselines/av-R-baseline.mat', 'task_baselines/av-L-base
                    'task_baselines/pk-8-26-R-baseline.mat'}; 
   
 
-path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/code_manuscript/data/healthy_controls/';
+path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/data/healthy_controls_goniometer/';
 
 %%%%%%%%% Get datatables %%%%%%%%%
 datatable_plane_tsk_bl = make_table_w_planes(sessions, hand, jts, baseline_fnames, path_to_data);
@@ -583,6 +598,7 @@ jts_tru = {'Thumb MCP',...
      'Index MCP',... 
     'Palm Flex',...
     'Palm Abd',...
+    'Palm Prono',...
     'Elbow Flex'};
 
 cmap = {[215,25,28]/255,...
