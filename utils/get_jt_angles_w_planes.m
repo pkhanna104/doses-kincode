@@ -138,7 +138,9 @@ for n = 1:s(1)
    th_dip(n) = acosd(dot(vt_dip, vt_pip)); 
 
    %% Palm %%% 
-   palm_prono(n)= data(n,3,palm_sensor); 
+   %palm_prono(n)= data(n,3,palm_sensor); 
+   palm_prono(n) = diff_roll(baseline_palm(3), data(n, 3, palm_sensor), hand_nm);
+   
    
    % Baseline for lower arm (palm sensor is above) 
    baseline_lower_arm = baseline.data.angles.(['sensor' num2str(lower_arm)])(end, :); 
