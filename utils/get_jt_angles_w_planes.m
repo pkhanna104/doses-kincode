@@ -178,7 +178,7 @@ if modify_angle_signs
     palm_abd = mod_true_angles(palm_abd, 'Palm_Abd', hand_nm); 
     palm_prono = mod_true_angles(palm_prono, 'Palm_Prono', hand_nm); 
     sh_horz = mod_true_angles(sh_horz, 'Shoulder_HorzFlex', hand_nm); 
-    sh_vert = mod_true_angles(sh_horz, 'Shoulder_VertFlex', hand_nm);
+    sh_vert = mod_true_angles(sh_vert, 'Shoulder_VertFlex', hand_nm);
     sh_rol = mod_true_angles(sh_rol, 'Shoulder_Roll', hand_nm); 
 end
 
