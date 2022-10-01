@@ -48,6 +48,7 @@ figure('Position', [10 10 600 400]); hold all
 xoff = 1;
 xlab = {};
 
+jt_error_all = struct(); 
 % For each joint 
 for j=1:length(jts)
     newjt = strrep(jts{j},' ','_');
@@ -86,6 +87,8 @@ for j=1:length(jts)
         
     end
     
+    jt_error_all.(newjt) = jt_error; 
+    
     h = bar(xoff, mean(jt_error)); hold all; 
     set(h,'FaceColor',[150, 150, 150]/255);
     errorbar(xoff, mean(jt_error), std(jt_error), 'color','k')
@@ -100,6 +103,9 @@ xtickangle(90);
 ylim([-30, 30])
 title('Within session reliability (7 hands, 4 subjects)')
 ylabel('Degrees'); 
+
+% Save out jt error data 
+save('data/precision_error_preeya.mat', 'jt_error_all'); 
 
 %% Figure 2 -- Repeated subject -- across session var; 
 sessions = {'pk-8-24', 'pk-8-24', 'pk-8-25-v2', 'pk-8-26',...
@@ -730,3 +736,6 @@ ax.XAxis.FontSize = 14;
 ylim([-30, 30])
 ylabel('Error (deg)');
     
+% Save out data 
+accuracy_data = sum_tru_dmnerr;  %struct containing errors of accuracy data per joint 
+save('data/rom_error_preeya.mat', 'accuracy_data');
