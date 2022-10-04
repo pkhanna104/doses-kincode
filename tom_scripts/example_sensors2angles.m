@@ -5,7 +5,7 @@ path_to_repository = 'C:\Users\toppenheim\Desktop\UCSF\thumb data\Preeya Data\da
 
 subjects = ["PK","FR","AV","SB","B8M","C9K","B12J","W16H_small","S13J_small","R15J_small"];
 
-for n = 8:size(subjects,2)
+for n = 5%:size(subjects,2)
     for m = 1:2
 
             disp(subjects(n))
@@ -25,8 +25,8 @@ for n = 8:size(subjects,2)
             session_id = convertStringsToChars(strcat(input,'_pinch_data.mat'));
             fname_save = convertStringsToChars(strcat(input,'_ctrl_baseline')); 
     
-            names1 = ["B8M","C9K","B12J","W16H_small","S13J_small"];
-            names2 = ["R15J_small","PK","FR","AV","SB"];
+            names1 = ["C9K","B12J","W16H_small","S13J_small"];
+            names2 = ["B8M","R15J_small","PK","FR","AV","SB"];
             
             %hand_nm -> which hand was unaffacted and which affected?? 
             %This is the left hand for all control data subjects (all were right-handed)
