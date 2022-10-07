@@ -1,4 +1,4 @@
-function [exc_data] = data_height_plot(data_palm,u_time,sign,input1,hand,on_off)
+function [exc_data] = data_height_plot(data_palm, height, u_time,sign,input1,hand,on_off)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %plotting raw data 10 trials from Preeya -> palm height vs data point in array (not
@@ -19,7 +19,12 @@ for n = 1:10;
        figure(fn1)
        subplot(5,2,n)
        dp = sign.*data_palm{n}(:,3);
+       yyaxis left
        plot(dp,'b'); 
+       yyaxis right
+       plot(height{n}, 'r'); 
+       ylabel('Obj Z-Height (cm)')
+       yyaxis left
        ylabel('Palm Z-Height (cm)')
        xlabel('Point in Array')
     
@@ -28,7 +33,10 @@ for n = 1:10;
        figure(fn2)
        subplot(5,2,n)
        dp = sign.*data_palm{n}(:,3);
+       yyaxis left
        plot(u_time{n},dp,'b'); 
+       yyaxis right
+       plot(u_time{n}, height{n}, 'r'); 
        ylabel('Palm Z-Height (cm)')
        xlabel('time (sec)')
    end
