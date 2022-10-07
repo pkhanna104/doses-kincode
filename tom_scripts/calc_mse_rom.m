@@ -5,13 +5,13 @@ function [mse_rom] = calc_mse_rom(output,input1,exc_data,hand)
     if any(convertCharsToStrings(hand) == "un")
         u = output.u; % z-scored trial 
         %u_unz = output.u_unz; % un-zscored trial 
-        u_rom = output.u_rom; % std of un-zscored trial 
+        %u_rom = output.u_rom; % std of un-zscored trial 
         u_rom_2_pinch = output.u_rom_2_pinch; % std of unz-scored trial truncated at pinch
     
     elseif any(convertCharsToStrings(hand) == "aff")
-        u = output.a;
+        u = output.a; % z-scored trial
         %u_unz = output.a_unz;
-        u_rom = output.a_rom;
+        %u_rom = output.a_rom;
         u_rom_2_pinch = output.a_rom_2_pinch;
     end
 
@@ -53,8 +53,6 @@ function [mse_rom] = calc_mse_rom(output,input1,exc_data,hand)
             %median rom of "un" zscored data from start to end of pinch task, same length as
             %median trial
             u_median_rom_2_pinch(m) = median(cell2mat(u_rom_2_pinch(:,m)));
-    
-    
     
         end
     end
