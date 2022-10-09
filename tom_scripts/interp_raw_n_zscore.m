@@ -83,6 +83,7 @@ for m = 1:12
         % Use the mean / std computed over all trials to z-score each
         % trial:
         u{n, m} = (u{n, m} - mu{m}) / sigma{m};
+        u_2_pinch{n, m} = (u_unz_2_pinch{n, m} - mu{m}) / sigma{m};
         
     end
 end
@@ -90,15 +91,25 @@ end
 
 if any(convertCharsToStrings(hand) == "un")
     unaf.u = u; % z-scored trial 
+    unaf.u_2_pinch = u_2_pinch; % z-scored trial truncated at pinch 
     unaf.u_unz = u_unz; % un-zscored trial 
+    unaf.u_unz_2_pinch = u_unz_2_pinch; % un-zscored trial trunacted at pinch 
     unaf.u_rom = u_rom; % std of un-zscored trial 
     unaf.u_rom_2_pinch = u_rom_2_pinch; % std of unz-scored trial truncated at pinch
+    unaf.zsc_mu = mu; % zscore parameters 
+    unaf.zsc_std = sigma; % zscore parameters 
     output = unaf;
+    
 elseif any(convertCharsToStrings(hand) == "aff")
     affe.a = u;
+    affe.a_2_pinch = u_2_pinch; % z-scored trial truncated at pinch 
     affe.a_unz = u_unz;
+    affe.a_unz_2_pinch = u_unz_2_pinch; % un-zscored trial trunacted at pinch 
     affe.a_rom = u_rom;
     affe.a_rom_2_pinch = u_rom_2_pinch;
+    affe.zsc_mu = mu; % zscore parameters 
+    affe.zsc_std = sigma; % zscore parameters 
+    
     output = affe;
 end
 
