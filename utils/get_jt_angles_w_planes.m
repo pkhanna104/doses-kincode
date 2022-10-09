@@ -170,6 +170,7 @@ for n = 1:s(1)
    sh_vert(n) = data(n,2,upper_arm); % elevation 
    sh_rol(n) =  data(n,3,upper_arm); % roll of sensor
    
+   
 end
    
 % Modifications for equalizing conventions for DOFs with signs in reference
@@ -181,6 +182,11 @@ if modify_angle_signs
     sh_vert = mod_true_angles(sh_vert, 'Shoulder_VertFlex', hand_nm);
     sh_rol = mod_true_angles(sh_rol, 'Shoulder_Roll', hand_nm); 
 end
+
+%% Unroll raw sensor data (e.g. if any cross overs in jts that use raw sensor data) 
+palm_prono = unroll_sensor(palm_prono); 
+sh_horz = unroll_sensor(sh_horz); 
+sh_vert = unroll_sensor(sh_vert); 
 
 angle_struct = struct(); 
 angle_struct.('Thumb_MCP') = th_mcp;
