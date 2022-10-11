@@ -1,11 +1,19 @@
 clear;clc;
 % Example code for getting joint angle data from sensor angles
 % This will change based on personal computer location
-path_to_repository = 'C:\Users\toppenheim\Desktop\UCSF\thumb data\Preeya Data\data\collated_data\Four healthy subject data\';
+if ismac % Preeya computer
+    path_to_repository = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/';
+    slash = '/'; 
+
+else % Tom computer 
+    path_to_repository = 'C:\Users\toppenheim\Desktop\UCSF\thumb data\Preeya Data\data\collated_data\doses-kincode-main\'; 
+    slash = '\'; 
+
+end
 
 subjects = ["PK","FR","AV","SB","B8M","C9K","B12J","W16H_small","S13J_small","R15J_small"];
 
-for n = 5%:size(subjects,2)
+for n = 5  %:size(subjects,2)
     for m = 1:2
 
             disp(subjects(n))
@@ -63,9 +71,9 @@ for n = 5%:size(subjects,2)
 %             if contains(convertCharsToStrings(input),"_small")
 %                 input = erase(input,"_small");
 %             end
-    
             
-            baseline_fname = string(strcat('C:\Users\toppenheim\Desktop\UCSF\thumb data\Preeya Data\data\collated_data\Four healthy subject data\data\task_data\baselines\',input,'_ctrl_baseline',data_key,'.mat')); 
+            
+            baseline_fname = string(strcat(path_to_repository, 'data', slash, 'task_data', slash, 'baselines', slash, input, '_ctrl_baseline', data_key, '.mat')); 
             prt = 0; % Dont print bend angle rolls 
             
             % Get path to data
@@ -84,11 +92,12 @@ for n = 5%:size(subjects,2)
             % Extract angle data
             angle_data = data.(data_key).angle_data; 
             
+            
             % Get angle structure -- final output of 
             angle_struct = get_jt_angles_w_planes(angle_data, datatype, baseline_fname, prt,...
                 hand_nm); 
             
-            filename = string(strcat('C:\Users\toppenheim\Desktop\UCSF\thumb data\Preeya Data\data\collated_data\Four healthy subject data\',input,'_jt_angle_',data_key2,'.mat'));
+            filename = string(strcat(path_to_repository, 'data', slash, 'tom_data', slash, 'jt_angle_data', slash, input, '_jt_angle_', data_key2, '.mat')); 
             save(filename,'angle_struct');
             
         
