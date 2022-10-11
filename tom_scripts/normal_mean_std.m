@@ -1,7 +1,7 @@
 function [u_rom_norm_mean,u_rom_norm_2xstd,u_mse_norm_mean, u_mse_norm_2xstd] = normal_mean_std(mse_rom)
 
-u_rom = mse_rom.u_rom_2_pinch; % rom calculated from start --> pinch on un-zscored data
-u_mse = mse_rom.u_mse_2_pinch; % mse calculated from start --> pinch on z-scored data
+u_rom = mse_rom.u_rom; % rom calculated from start --> pinch on un-zscored data
+u_mse = mse_rom.u_mse; % mse calculated from start --> pinch on z-scored data
 
 
 C = nchoosek([1:10],5);
