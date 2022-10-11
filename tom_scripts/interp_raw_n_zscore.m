@@ -1,9 +1,8 @@
-function [output] = interp_raw_n_zscore(unaffect_all,data_palm,height,input1,sign,exc_data,hand,on_off);
+function [output] = interp_raw_n_zscore(path_to_data,slash,unaffect_all,data_palm,height,input1,sign,hand,on_off);
 
-excel_ut_real = exc_data.(hand).raw; % full trial length
-excel_ut_length = exc_data.(hand).median; % trial length to interpolate to
-excel_u = exc_data.(hand).s2p; % in new interpolated data pts for start2pinch
-u_times = exc_data.(hand).t_times;
+%string to pinch indices obtained using data_height_plot.m and ginput.m
+Filename =  convertStringsToChars(string(strcat(input1,'_st_2_pi_',hand,'.mat')));
+load([path_to_data 'data' slash 'tom_data' slash 'start_2_pinch_data' slash Filename]);
 
 if any(convertCharsToStrings(hand) == "un")
     fn3 = 3;
@@ -11,14 +10,21 @@ elseif any(convertCharsToStrings(hand) == "aff")
     fn3 = 6;
 end
 
+for n = 1:10
+    %start to end of pinch trial length
+    %st_2_pi is rounded because ginput selects decimal values 
+
+    trial_lengths(n) = round(st_2_pi{n}(2,1))-round(st_2_pi{n}(1,1)); 
+end
+mtl = median(trial_lengths); %median trial length of all ten trials
 
 for n = 1:10 % Trials
     dp = sign.*data_palm{n}(:,3);
-    indices = excel_ut_real(n,1):excel_ut_real(n,2);
+    indices = round(st_2_pi{n}(1,1)):round(st_2_pi{n}(2,1));
     dp_new = dp(indices);  %full trial length
     
     t0 = 1:length(dp_new); % original time axis
-    t1 = linspace(1, length(dp_new), excel_ut_length); % new time axis that still varies between 1 and length(u_new) but has more datapoints;
+    t1 = linspace(1, length(dp_new), mtl); % new time axis that still varies between 1 and length(u_new) but has more datapoints;
     
     dp = interp1(t0,dp_new,t1); %data to be used for zscoring
     obj_height = interp1(t0, height{n}(indices), t1);
@@ -34,11 +40,11 @@ for n = 1:10 % Trials
         figure(fn3)
         subplot(5,2,n)
         plot(dp,'b');hold on; % new interpolated DP
-        plot(dp(1:excel_u(n,2)),'r','LineWidth',3)
+        %plot(dp(1:excel_u(n,2)),'r','LineWidth',3)
         
         yyaxis right
         plot(obj_height, 'g'); hold on;
-        plot(obj_height(1:excel_u(n,2)),'c-','LineWidth',3)
+        %plot(obj_height(1:excel_u(n,2)),'c-','LineWidth',3)
         
         yyaxis left;
         ylabel('Palm Z-Height (cm)')
@@ -51,19 +57,14 @@ for n = 1:10 % Trials
     for m = 1:12 % joint angles
         u_o = unaffect_all{1,n}(:,m);
         u_new = u_o(indices);  %raw joint angle data from trial start to trial end
-        u{n,m} = interp1(t0,u_new,t1); %interpolated raw joint angle data to be used for zscoring
-        
-        u_unz{n, m} = u{n, m}; % Store un-zscored raw joint angle data
-        u_unz_2_pinch{n, m} = u{n, m}(1:excel_u(n,2)); % Truncated interpolated raw joint angle data
-        
-        % For ROM calculate based on u_unz
-        u_rom{n,m} = std(u_unz{n,m});
-        u_rom_2_pinch{n,m} = nanstd(u_unz_2_pinch{n,m});
-        
+        u{n,m} = interp1(t0,u_new,t1); %interpolated raw joint angle data to be used for zscoring, same length median trial
+   
+        % For ROM calculate based on u
+        u_rom{n,m} = std(u{n,m});
+                
         % Make sure no nans;
         assert(~isnan(u_rom{n,m}))
-        assert(~isnan(u_rom_2_pinch{n,m}))
-        
+               
     end
 end
 
@@ -72,7 +73,7 @@ end
 for m = 1:12
     
     % mean / std for joint: %
-    jt_data = cell2mat(u(:, m)); 
+    jt_data = cell2mat(u(:, m));  %u same length median trial
     resh_jt_data = reshape(jt_data, [1, size(jt_data, 1)*size(jt_data, 2)]); 
     
     mu{m} = mean(resh_jt_data); 
@@ -82,34 +83,27 @@ for m = 1:12
         
         % Use the mean / std computed over all trials to z-score each
         % trial:
-        u{n, m} = (u{n, m} - mu{m}) / sigma{m};
-        u_2_pinch{n, m} = (u_unz_2_pinch{n, m} - mu{m}) / sigma{m};
-        
+        u_zs{n, m} = (u{n, m} - mu{m}) / sigma{m};       
     end
 end
 
 
 if any(convertCharsToStrings(hand) == "un")
-    unaf.u = u; % z-scored trial 
-    unaf.u_2_pinch = u_2_pinch; % z-scored trial truncated at pinch 
-    unaf.u_unz = u_unz; % un-zscored trial 
-    unaf.u_unz_2_pinch = u_unz_2_pinch; % un-zscored trial trunacted at pinch 
-    unaf.u_rom = u_rom; % std of un-zscored trial 
-    unaf.u_rom_2_pinch = u_rom_2_pinch; % std of unz-scored trial truncated at pinch
+    unaf.u = u; % un z-scored trial
+    unaf.u_zs = u_zs; % z-scored trial 
+    unaf.u_rom = u_rom; % std of unz-scored trial truncated at pinch
     unaf.zsc_mu = mu; % zscore parameters 
     unaf.zsc_std = sigma; % zscore parameters 
+    unaf.mtl = mtl; %median trial length from start to end of pinch task 
     output = unaf;
     
 elseif any(convertCharsToStrings(hand) == "aff")
-    affe.a = u;
-    affe.a_2_pinch = u_2_pinch; % z-scored trial truncated at pinch 
-    affe.a_unz = u_unz;
-    affe.a_unz_2_pinch = u_unz_2_pinch; % un-zscored trial trunacted at pinch 
-    affe.a_rom = u_rom;
-    affe.a_rom_2_pinch = u_rom_2_pinch;
+    affe.a = u; % z-scored trial
+    affe.a_zs = u_zs; % z-scored trial 
+    affe.a_rom = u_rom; % std of unz-scored trial truncated at pinch
     affe.zsc_mu = mu; % zscore parameters 
     affe.zsc_std = sigma; % zscore parameters 
-    
+    affe.mtl = mtl; %median trial length from start to end of pinch task 
     output = affe;
 end
 
