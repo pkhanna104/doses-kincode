@@ -1,4 +1,4 @@
-function [output] = interp_raw_n_zscore(path_to_data,slash,unaffect_all,data_palm,height,input1,sign,hand,on_off);
+function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm,height,input1,sign,hand,on_off);
 
 %string to pinch indices obtained using data_height_plot.m and ginput.m
 Filename =  convertStringsToChars(string(strcat(input1,'_st_2_pi_',hand,'.mat')));
@@ -21,6 +21,7 @@ mtl = median(trial_lengths); %median trial length of all ten trials
 for n = 1:10 % Trials
     dp = sign.*data_palm{n}(:,3);
     indices = round(st_2_pi{n}(1,1)):round(st_2_pi{n}(2,1));
+    ind{n} = indices;
     dp_new = dp(indices);  %full trial length
     
     t0 = 1:length(dp_new); % original time axis
@@ -58,7 +59,7 @@ for n = 1:10 % Trials
         u_o = unaffect_all{1,n}(:,m);
         u_new = u_o(indices);  %raw joint angle data from trial start to trial end
         u{n,m} = interp1(t0,u_new,t1); %interpolated raw joint angle data to be used for zscoring, same length median trial
-   
+        
         % For ROM calculate based on u
         u_rom{n,m} = std(u{n,m});
                 
@@ -90,6 +91,7 @@ end
 
 if any(convertCharsToStrings(hand) == "un")
     unaf.u = u; % un z-scored trial
+    unaf.u_ind = ind;
     unaf.u_zs = u_zs; % z-scored trial 
     unaf.u_rom = u_rom; % std of unz-scored trial truncated at pinch
     unaf.zsc_mu = mu; % zscore parameters 
@@ -99,6 +101,7 @@ if any(convertCharsToStrings(hand) == "un")
     
 elseif any(convertCharsToStrings(hand) == "aff")
     affe.a = u; % z-scored trial
+    affe.a_ind = ind;
     affe.a_zs = u_zs; % z-scored trial 
     affe.a_rom = u_rom; % std of unz-scored trial truncated at pinch
     affe.zsc_mu = mu; % zscore parameters 
