@@ -14,9 +14,17 @@ function paper_fig2_raw(Filename,hand,angle_struct,sub_plot_num,on_off)
         slash = '\'; 
 
     end
-    level = wildcardPattern + "\";
-    pat = asManyOfPattern(level);
-    input1 = convertStringsToChars(extractAfter(input1,pat));  %returns only the subject name, not path preeceding!
+    % preeya update 10/18 -- this code block didn't work for me (in matlab
+    % 2022, perhaps matlab version discrepancy) 
+    split_filename = strsplit(input1, slash); 
+
+    % ID after last slash
+    input1 = split_filename(end); 
+
+    %level = wildcardPattern + "\";
+    %pat = asManyOfPattern(level);
+    %input1 = convertStringsToChars(extractAfter(input1,pat));  %returns only the subject name, not path preeceding!
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     if any(convertCharsToStrings(hand) == "un")
