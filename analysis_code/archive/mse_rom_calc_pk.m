@@ -5,7 +5,7 @@ if ismac % Preeya computer
     slash = '/'; 
 
 else % Tom computer 
-    path_to_data = ''; 
+    path_to_data = ''; % @Tom, enter path to "doses-kincode" code here
     slash = '\'; 
 
 end
