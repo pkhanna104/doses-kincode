@@ -30,8 +30,8 @@ for n = 1:10;
 
        % (1) select start of test point and (2) end of pinch task 
        %marked by object going back down to zero height
-       st_2_pi{n} = ginput(2);  
-           
+       st_2_pi{n} = ginput(2);  % row 1 -- (x,y) of pt1, row 2 -- (x,y) of pt2
+       
        %plots palm height raw data vs time according to raw time data split into
        %ten trials (ten trials split is calculated from jt_angle_split.m
        figure(fn2)
