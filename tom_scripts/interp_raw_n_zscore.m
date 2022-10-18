@@ -100,7 +100,7 @@ if any(convertCharsToStrings(hand) == "un")
     output = unaf;
     
 elseif any(convertCharsToStrings(hand) == "aff")
-    affe.a = u; % z-scored trial
+    affe.a = u; % un z-scored trial
     affe.a_ind = ind;
     affe.a_zs = u_zs; % z-scored trial 
     affe.a_rom = u_rom; % std of unz-scored trial truncated at pinch
