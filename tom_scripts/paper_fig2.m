@@ -3,7 +3,7 @@ clear;clc;close all;
 if ismac % Preeya computer
     path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/';
     slash = '/'; 
-setdiff(1:n, row)
+
 else % Tom computer 
     path_to_data = 'C:\Users\toppenheim\Desktop\UCSF\thumb data\Preeya Data\data\collated_data\doses-kincode-main\'; 
     slash = '\'; 
@@ -43,7 +43,7 @@ for sub = 1:6
     if any(sub == [1:3])
         paper_fig2_raw(Filename,'aff',angle_struct,sub,'off');hold on; 
     end
-    
+
 
     if contains(input,'_small') 
         input = erase(input,'_small');
