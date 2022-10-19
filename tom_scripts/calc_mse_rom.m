@@ -6,16 +6,19 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
     if any(convertCharsToStrings(hand) == "un")
         u_zs = output.u_zs; % z-scored trial 
         u_rom = output.u_rom; % std of unz-scored trial truncated at pinch
+        u_rom_max = output.u_rom_max; 
+        u_rom_min = output.u_rom_min; 
         u_unzs = output.u; % Un-zscored; 
 
     elseif any(convertCharsToStrings(hand) == "aff")
         u_zs = output.a_zs; % z-scored trial
         u_rom = output.a_rom;
+        u_rom_max = output.a_rom_max; 
+        u_rom_min = output.a_rom_min; 
         u_unzs = output.a; % Un-zscored; 
     end
 
-    % Load accuracy / precision data % 
-    acc = load([path_to_data 'data' slash 'rom_error_preeya.mat']); 
+    % Load precision data % 
     prec = load([path_to_data 'data' slash 'precision_error_preeya.mat']); 
     
     % Joint names in accuracy; 
@@ -28,8 +31,6 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
         'Elbow_Flex', 'Palm_Abd', 'Palm_Flex', 'Palm_Prono', 'Shoulder_HorzFlex',...
         'Shoulder_VertFlex'}; 
     
-    skip_jt_bc_var_too_low = {}; 
-    
     for m = 1:12
         
         % moved this line to outside n=1:10 trial loop so not re-written
@@ -37,35 +38,6 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
         %median angles of zscored data from start to end, same length as median trial
         u_median_zs{m} = median(cell2mat(u_zs(:,m)));% Median z-scored data truncated at pinch
         assert(length(u_median_zs{m}) == size(u_zs{1, m}, 2)) % make sure size of median makes sense
-            
-        % check whether this subject / jt variation is >> expected
-        % concatenat un-zscored trial; 
-        u_cat = []; 
-        for n = 1:10
-            u_cat = [u_cat u_unzs{n, m}]; 
-        end
-
-        % Compare this to accuracy variation: 
-        if m < 12
-            acc_data = acc.accuracy_data.(jt_names{m}); 
-
-            %if pv < 0.05: variance of u_cat is greater than variance of
-            %acc_data, so we can safely proceed to analyze; 
-            %[~,pv] = vartest2(u_cat, acc_data, 'alpha', 0.05,...
-            %    'tail', 'right'); 
-
-            %if pv >= 0.05: variance of acc_data is NOT greater than variance of
-            %u_cat, so we can slightly less safely proceed to analyze; 
-            [~,pv] = vartest2(u_cat, acc_data, 'alpha', 0.05,...
-                'tail', 'left'); 
-
-            if pv >= 0.05
-                skip_jt_bc_var_too_low{m} = 0; 
-            else
-                skip_jt_bc_var_too_low{m} = 1;
-                disp(['Var of jt sig lower than acc ' jt_names{m}])
-            end
-        end
         
         % Get z-scored params 
         zsc_mu = output.zsc_mu{m}; 
@@ -106,18 +78,21 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
         %median trial
         u_median_rom(m) = median(cell2mat(u_rom(:,m)));
 
+
+        %%% use accuracy data to add error bars to u_rom: 
+        u_median_rom_min(m) = median(cell2mat(u_rom_max(:,m)));
+        u_median_rom_max(m) = median(cell2mat(u_rom_min(:,m)));
+
     end
 
   if any(convertCharsToStrings(hand) == "un")
     umr.u_rom = u_rom;
     umr.u_mse = u_mse;
     umr.u_median_rom = u_median_rom;
-    umr.u_skip_jt_bc_var_too_low = skip_jt_bc_var_too_low; 
     mse_rom = umr;
   elseif any(convertCharsToStrings(hand) == "aff")
     amr.a_rom = u_rom;
     amr.a_mse = u_mse;
     amr.a_median_rom = u_median_rom;
-    amr.a_skip_jt_bc_var_too_low = skip_jt_bc_var_too_low; 
     mse_rom = amr;
   end
