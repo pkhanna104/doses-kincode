@@ -49,16 +49,21 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
         if m < 12
             acc_data = acc.accuracy_data.(jt_names{m}); 
 
-            [~,pv] = vartest2(u_cat, acc_data, 'alpha', 0.1,...
-                'tail', 'right'); 
             %if pv < 0.05: variance of u_cat is greater than variance of
             %acc_data, so we can safely proceed to analyze; 
+            %[~,pv] = vartest2(u_cat, acc_data, 'alpha', 0.05,...
+            %    'tail', 'right'); 
 
-            if pv > 0.05
-                skip_jt_bc_var_too_low{m} = 1; 
-                disp(['Var too low in jt ' jt_names{m}])
-            else
+            %if pv >= 0.05: variance of acc_data is NOT greater than variance of
+            %u_cat, so we can slightly less safely proceed to analyze; 
+            [~,pv] = vartest2(u_cat, acc_data, 'alpha', 0.05,...
+                'tail', 'left'); 
+
+            if pv >= 0.05
                 skip_jt_bc_var_too_low{m} = 0; 
+            else
+                skip_jt_bc_var_too_low{m} = 1;
+                disp(['Var of jt sig lower than acc ' jt_names{m}])
             end
         end
         
