@@ -4,6 +4,12 @@ function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,d
 Filename =  convertStringsToChars(string(strcat(input1,'_st_2_pi_',hand,'.mat')));
 load([path_to_data 'data' slash 'tom_data' slash 'start_2_pinch_data' slash Filename]);
 
+% Load accuracy data for use in ROM calc
+jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...
+        'Elbow_Flex', 'Palm_Abd', 'Palm_Flex', 'Palm_Prono', 'Shoulder_HorzFlex',...
+        'Shoulder_VertFlex'}; 
+acc = load([path_to_data 'data' slash 'rom_error_preeya.mat']); 
+
 if any(convertCharsToStrings(hand) == "un")
     fn3 = 3;
 elseif any(convertCharsToStrings(hand) == "aff")
@@ -61,10 +67,21 @@ for n = 1:10 % Trials
         u{n,m} = interp1(t0,u_new,t1); %interpolated raw joint angle data to be used for zscoring, same length median trial
         
         % For ROM calculate based on u
-        u_rom{n,m} = std(u{n,m});
+        if m < 12
+            [rom_min, rom_max, rom] = calc_rom_w_error(u{n,m}, acc.accuracy_data.(jt_names{m})); 
+        else % Shoulder roll; 
+            rom = std(u{n, m}); 
+            rom_min = rom; 
+            rom_max = rom; 
+        end
+        u_rom{n,m} = rom; 
+        u_rom_min{n,m} = rom_min; 
+        u_rom_max{n,m} = rom_max; 
                 
         % Make sure no nans;
         assert(~isnan(u_rom{n,m}))
+        assert(~isnan(u_rom_max{n,m}))
+        assert(~isnan(u_rom_min{n,m}))
                
     end
 end
@@ -94,6 +111,8 @@ if any(convertCharsToStrings(hand) == "un")
     unaf.u_ind = ind;
     unaf.u_zs = u_zs; % z-scored trial 
     unaf.u_rom = u_rom; % std of unz-scored trial truncated at pinch
+    unaf.u_rom_max = u_rom_max; 
+    unaf.u_rom_min = u_rom_min; 
     unaf.zsc_mu = mu; % zscore parameters 
     unaf.zsc_std = sigma; % zscore parameters 
     unaf.mtl = mtl; %median trial length from start to end of pinch task 
@@ -104,6 +123,8 @@ elseif any(convertCharsToStrings(hand) == "aff")
     affe.a_ind = ind;
     affe.a_zs = u_zs; % z-scored trial 
     affe.a_rom = u_rom; % std of unz-scored trial truncated at pinch
+    affe.a_rom_max = u_rom_max; 
+    affe.a_rom_min = u_rom_min; 
     affe.zsc_mu = mu; % zscore parameters 
     affe.zsc_std = sigma; % zscore parameters 
     affe.mtl = mtl; %median trial length from start to end of pinch task 
