@@ -30,13 +30,13 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
             trl_s2p = u_zs{n,m};  % Individual trial trucated at pinch
             u_mse{n,m} = (1/length(trl_s2p).*sum((trl_s2p-med_s2p).^2));
             
-            
-            %%% ROM calculations 
-            %median rom of "un" zscored data from start to end of pinch task, same length as
-            %median trial
-            u_median_rom(m) = median(cell2mat(u_rom(:,m)));
-    
         end
+
+        %%% ROM calculations 
+        %median rom of "un" zscored data from start to end of pinch task, same length as
+        %median trial
+        u_median_rom(m) = median(cell2mat(u_rom(:,m)));
+
     end
 
   if any(convertCharsToStrings(hand) == "un")
