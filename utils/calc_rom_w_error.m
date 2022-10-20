@@ -26,9 +26,21 @@ for i = 1:N
 end
 
 rom = sqrt(rom_/(N-1));
-assert(abs(rom - rom_init) < 1e-13);
+try 
+    assert(abs(rom - rom_init) < 1e-12);
+catch
+    keyboard; 
+end
 
 rom_min = sqrt(rom_min_/(N-1));
 rom_max = sqrt(rom_max_/(N-1));
+
+if rom_max <= rom_min
+    keyboard
+end
+
+if rom_min > rom
+    rom_min = rom; 
+end
 
 
