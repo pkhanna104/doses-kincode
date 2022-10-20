@@ -145,3 +145,40 @@ end
 
 % Save datatable
 save(['data/datatable' num2str(nstd) 'std_acc_samp_prec.mat'], 'datatable')
+
+%% Plot showing range of angles measured vs. actual range exerted during the task
+jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...
+    'Elbow_Flex', 'Palm_Abd', 'Palm_Flex', 'Palm_Prono', 'Shoulder_HorzFlex',...
+    'Shoulder_VertFlex'}; 
+
+roms_all = []; 
+for jt=1:11
+    rom_jt = []; 
+    for i=1:length(datatable)
+        if datatable{i}{3} == jt % correct jt
+            if datatable{i}{2} == 1 % control subject
+                rom_jt = [rom_jt datatable{i}{6}(2)]; % add rom
+            end
+        end
+    end
+    % 4*sd covers ~95% of data
+    roms_all = [roms_all 4*mean(rom_jt)]; 
+end
+
+% Measured range of motion 
+jt_var_list = [40, 30, 60, 60, 30, 90, 30, 90, 90, 60, 60]; 
+figure; hold all; 
+
+for i = 1:11
+    plot(jt_var_list(i), roms_all(i), 'k.', 'Markersize', 20); hold all; 
+    text(jt_var_list(i), roms_all(i), jt_names{i}, 'FontSize', 14); 
+end
+
+b1 = jt_var_list'\roms_all'; 
+y1 = b1*jt_var_list; 
+plot(jt_var_list, y1, 'k--')
+xlabel('Angle Variation Tested (max-min)')
+ylabel('Angle Variation during Task (4*std=95% of data)')
+xlim([0, 110])
+ylim([0, 110])
+title(["Line slope = " num2str(b1)])
