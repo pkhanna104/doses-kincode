@@ -1,4 +1,4 @@
-function [rom_min, rom_max, rom] = calc_rom_w_error(jt, acc)
+function [rom_min, rom_max, rom] = calc_rom_w_error(jt, acc, nstd)
 
 rom_init = std(jt);
 
@@ -6,7 +6,7 @@ rom_ = 0;
 rom_min_ = 0;
 rom_max_ = 0;
 
-std_acc = std(acc);
+std_acc = nstd*std(acc);
 mn = mean(jt);
 N = length(jt);
 for i = 1:N
