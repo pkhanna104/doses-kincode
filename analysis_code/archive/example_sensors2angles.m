@@ -6,18 +6,25 @@ path_to_repository = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensor
 % Some of the calculations require a 'baseline' period when the hand is
 % flat on the table. A script below has been made to help identify this
 % period. Below is an example for one of the control data sessions
-session_id = 'PK_ctrl_pinch_data.mat'; 
-fname_save = 'PK_ctrl_baseline'; 
-create_baseline_from_syncd_taskfile(fname_save, path_to_repository)
+%session_id = 'PK_ctrl_pinch_data.mat'; 
+%fname_save = 'PK_ctrl_baseline'; 
+
+%create_baseline_from_syncd_taskfile(fname_save, path_to_repository)
 
 %% Step two: convert task angle data to bend angles using plane method 
-session_fname = 'PK_ctrl_pinch_data.mat';
-datatype = 'ctrl_task_data'; % Other option is "patient_task_data" -- this affects which sensors are used
-
-% This is the left hand for all control data subjects (all were right-handed)
+session_fname = 'B8M_pinch_data.mat';
+datatype = 'patient_task_data'; 
+baseline_fname = 'B8M_ctrl_baselineaffected.mat'; 
 data_key = 'affected'; 
 hand_nm = 'Left'; 
-baseline_fname = 'PK_ctrl_baselineaffected.mat'; 
+%session_fname = 'PK_ctrl_pinch_data.mat';
+%datatype = 'ctrl_task_data'; % Other option is "patient_task_data" -- this affects which sensors are used
+
+% This is the left hand for all control data subjects (all were right-handed)
+%data_key = 'affected'; 
+%hand_nm = 'Left'; 
+%baseline_fname = 'PK_ctrl_baselineaffected.mat'; 
+
 prt = 0; % Dont print bend angle rolls 
 
 % Get path to data
