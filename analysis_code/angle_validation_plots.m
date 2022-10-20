@@ -91,7 +91,7 @@ for j=1:length(jts)
     
     h = bar(xoff, mean(jt_error)); hold all; 
     set(h,'FaceColor',[150, 150, 150]/255);
-    errorbar(xoff, mean(jt_error), std(jt_error), 'color','k')
+    errorbar(xoff, mean(jt_error), 1*circStd(jt_error), 'color','k')
     %newjt2 = strrep(newjt, '_', ' '); 
     xlab{end+1} = jt_names{xoff};
     xoff = xoff + 1;
@@ -119,7 +119,7 @@ baseline_fnames = {'prono0_baselines/pk-8-24-L-baseline.mat',...
                    'prono0_baselines/pk-8-26-R2-edited-baseline.mat',...
                    }; 
 hand = {'Left', 'Right', 'Left', 'Left', 'Right', 'Right'};
-path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/code_manuscript/data/healthy_controls/';
+path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/data/healthy_controls_goniometer/';
 
 % Only assess for angles with absolute values (not relative values) 
 jts = {'Thumb MCP', % dot product
@@ -223,12 +223,12 @@ for j=1:length(jts)
     subplot(1, 2, 1); hold all; 
     h = bar(xoff, mean(jt_error_xsess));  
     set(h,'FaceColor',[150, 150, 150]/255);
-    errorbar(xoff, mean(jt_error_xsess), std(jt_error_xsess), 'color','k')
+    errorbar(xoff, mean(jt_error_xsess), 1*circStd(jt_error_xsess), 'color','k')
     
     subplot(1, 2, 2); hold all; 
     h = bar(xoff, mean(jt_error_xsess_dmn)); 
     set(h,'FaceColor',[150, 150, 150]/255);
-    errorbar(xoff, mean(jt_error_xsess_dmn), std(jt_error_xsess_dmn), 'color','k')
+    errorbar(xoff, mean(jt_error_xsess_dmn), 1*circStd(jt_error_xsess_dmn), 'color','k')
     
     newjt2 = strrep(newjt, '_', ' '); 
     xlab{end+1} = newjt2;
@@ -328,7 +328,7 @@ for j=1:length(jts)
     
     h = bar(xoff, mean(jt_error_xsess));  
     set(h,'FaceColor',[150, 150, 150]/255);
-    errorbar(xoff, mean(jt_error_xsess), std(jt_error_xsess), 'color','k')
+    errorbar(xoff, mean(jt_error_xsess), 1*circStd(jt_error_xsess), 'color','k')
     %plot(xoff + .1*randn(1, length(jt_error_xsess)), jt_error_xsess, 'k.')
     newjt2 = strrep(newjt, '_', ' '); 
     xlab{end+1} = newjt2;
@@ -586,6 +586,8 @@ for j = 1:length(jts)
     
 end
 
+
+
 %% Figures 5 -- error plots 
 
 % Figure of true and dmn errors 
@@ -656,7 +658,7 @@ for i_h = 1:length(hands)
                 subplot(2, 7, i_h);
                 h=bar(length(xlab0), circMean(err));
                 set(h,'FaceColor',cols{i_j});
-                errorbar(length(xlab0), circMean(err), std(err), 'color', 'k'); 
+                errorbar(length(xlab0), circMean(err), 1*circStd(err), 'color', 'k'); 
                 
                 sum_tru_err.(newjt) = [sum_tru_err.(newjt) err];  
                 
@@ -665,7 +667,7 @@ for i_h = 1:length(hands)
             subplot(2, 7, i_h + 7);
             h=bar(i_j, circMean(err_d));
             set(h,'FaceColor',cols{i_j});
-            errorbar(i_j, circMean(err_d), std(err_d), 'color', 'k');
+            errorbar(i_j, circMean(err_d), 1*circStd(err_d), 'color', 'k');
             sum_tru_dmnerr.(newjt) = [sum_tru_dmnerr.(newjt) err_d]; 
         end
     end
@@ -706,7 +708,7 @@ for i_j = 1:length(jts)
         subplot(1, 2, 1); 
         h = bar(tru_cnt, circMean(errs)); 
         set(h,'FaceColor',cols{i_j});
-        errorbar(tru_cnt, circMean(errs), std(errs), 'color', 'k');
+        errorbar(tru_cnt, circMean(errs), 1*circStd(errs), 'color', 'k');
         xlab0{end+1} = jts{i_j}; 
     end
     
@@ -714,7 +716,7 @@ for i_j = 1:length(jts)
     subplot(1, 2, 2); 
     h = bar(i_j, circMean(errs_d)); 
     set(h,'FaceColor',cols{i_j});
-    errorbar(i_j, circMean(errs_d), std(errs_d), 'color', 'k');
+    errorbar(i_j, circMean(errs_d), 1*circStd(errs_d), 'color', 'k');
     xlab{end+1} = jts{i_j}; 
 end
 
