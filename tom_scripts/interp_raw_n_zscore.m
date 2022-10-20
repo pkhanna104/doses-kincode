@@ -1,4 +1,4 @@
-function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm,height,input1,sign,hand,on_off);
+function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm,height,input1,sign,hand,on_off, nstd);
 
 %string to pinch indices obtained using data_height_plot.m and ginput.m
 Filename =  convertStringsToChars(string(strcat(input1,'_st_2_pi_',hand,'.mat')));
@@ -22,7 +22,10 @@ for n = 1:10
 
     trial_lengths(n) = round(st_2_pi{n}(2,1))-round(st_2_pi{n}(1,1)); 
 end
-mtl = median(trial_lengths); %median trial length of all ten trials
+
+% Edited PK on 10/20/22 -- changed all trial lengths to 100 after doing
+% simulations to show effects of "N" on MSE/ROM
+mtl = 100; %median(trial_lengths); %median trial length of all ten trials
 
 for n = 1:10 % Trials
     dp = sign.*data_palm{n}(:,3);
@@ -68,7 +71,7 @@ for n = 1:10 % Trials
         
         % For ROM calculate based on u
         if m < 12
-            [rom_min, rom_max, rom] = calc_rom_w_error(u{n,m}, acc.accuracy_data.(jt_names{m})); 
+            [rom_min, rom_max, rom] = calc_rom_w_error(u{n,m}, acc.accuracy_data.(jt_names{m}), nstd); 
         else % Shoulder roll; 
             rom = std(u{n, m}); 
             rom_min = rom; 

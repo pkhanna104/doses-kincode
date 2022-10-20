@@ -47,7 +47,7 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
             % 95th percentile of precision error; 
             %max_imprec = prctile(abs(prec.jt_error_all.(jt_names{m})), 95); 
             %max_imprec = mean(abs(prec.jt_error_all.(jt_names{m}))); 
-            max_imprec = std(prec.jt_error_all.(jt_names{m})); % spread of datapoints 
+            max_imprec = std(prec.jt_error_all.(jt_names{m})); 
             
             % z-score: 
             % don't need to subtract mean bc already an error; 
