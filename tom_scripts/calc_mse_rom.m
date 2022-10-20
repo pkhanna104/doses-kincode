@@ -8,14 +8,14 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
         u_rom = output.u_rom; % std of unz-scored trial truncated at pinch
         u_rom_max = output.u_rom_max; 
         u_rom_min = output.u_rom_min; 
-        u_unzs = output.u; % Un-zscored; 
+        %u_unzs = output.u; % Un-zscored; 
 
     elseif any(convertCharsToStrings(hand) == "aff")
         u_zs = output.a_zs; % z-scored trial
         u_rom = output.a_rom;
         u_rom_max = output.a_rom_max; 
         u_rom_min = output.a_rom_min; 
-        u_unzs = output.a; % Un-zscored; 
+        %u_unzs = output.a; % Un-zscored; 
     end
 
     % Load precision data % 
@@ -45,11 +45,14 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
 
         if m < 12
             % 95th percentile of precision error; 
-            max_imprec = prctile(abs(prec.jt_error_all.(jt_names{m})), 95); 
-        
+            %max_imprec = prctile(abs(prec.jt_error_all.(jt_names{m})), 95); 
+            %max_imprec = mean(abs(prec.jt_error_all.(jt_names{m}))); 
+            max_imprec = std(prec.jt_error_all.(jt_names{m})); % spread of datapoints 
+            
             % z-score: 
             % don't need to subtract mean bc already an error; 
             max_imprec_z = (max_imprec) / zsc_std; 
+            % disp(['Jt ' jt_names{m} ', ' num2str(max_imprec), ': Z : ' num2str(max_imprec_z)])
         else
             max_imprec_z = 0; 
         end 
@@ -62,37 +65,54 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
             med_s2p = u_median_zs{m}; % Median truncated at pinch
             trl_s2p = u_zs{n,m};  % Individual trial trucated at pinch
     
-            % 10/18/22: preeya additions
-            % Diff b/w/ trl and median (z-scored); 
-            diff_ = abs(trl_s2p-med_s2p);
-
-            % Make sure minimum of diff isnt less than precision estima
-            diff_(diff_ < max_imprec_z) = max_imprec_z; 
-
-            u_mse{n,m} = (1/length(trl_s2p).*sum(diff_.^2));
+            [mse_min, mse_max, mse] = calc_mse_w_error(trl_s2p, med_s2p, max_imprec_z); 
             
+            u_mse{n,m} = mse; %sqrt(1/length(trl_s2p).*sum(diff_.^2));
+            u_mse_min{n, m} = mse_min; 
+            u_mse_max{n, m} = mse_max; 
         end
 
-        %%% ROM calculations 
+        %%% Median ROM calculations 
         %median rom of "un" zscored data from start to end of pinch task, same length as
         %median trial
         u_median_rom(m) = median(cell2mat(u_rom(:,m)));
 
-
         %%% use accuracy data to add error bars to u_rom: 
-        u_median_rom_min(m) = median(cell2mat(u_rom_max(:,m)));
-        u_median_rom_max(m) = median(cell2mat(u_rom_min(:,m)));
+        u_median_rom_min(m) = median(cell2mat(u_rom_min(:,m)));
+        u_median_rom_max(m) = median(cell2mat(u_rom_max(:,m)));
+        assert(u_median_rom_min(m) <= u_median_rom_max(m))
+        assert(u_median_rom_min(m) <= u_median_rom(m))
+
+        %%%% Median MSE calculations 
+        u_median_mse(m) = median(cell2mat(u_mse(:,m)));
+        u_median_mse_min(m) = median(cell2mat(u_mse_min(:,m)));
+        u_median_mse_max(m) = median(cell2mat(u_mse_max(:,m)));
+
+        assert(u_median_mse_min(m) <= u_median_mse(m))
+        assert(u_median_mse(m) <= u_median_mse_max(m))
 
     end
 
   if any(convertCharsToStrings(hand) == "un")
     umr.u_rom = u_rom;
-    umr.u_mse = u_mse;
+    umr.u_median_mse = u_median_mse;
+    umr.u_median_mse_min = u_median_mse_min;
+    umr.u_median_mse_max = u_median_mse_max;
+
     umr.u_median_rom = u_median_rom;
+    umr.u_median_rom_min = u_median_rom_min;
+    umr.u_median_rom_max = u_median_rom_max; 
     mse_rom = umr;
+
   elseif any(convertCharsToStrings(hand) == "aff")
     amr.a_rom = u_rom;
-    amr.a_mse = u_mse;
+    amr.a_median_mse = u_median_mse;
+    amr.a_median_mse_min = u_median_mse_min;
+    amr.a_median_mse_max = u_median_mse_max;
+
     amr.a_median_rom = u_median_rom;
+    amr.a_median_rom_min = u_median_rom_min;
+    amr.a_median_rom_max = u_median_rom_max; 
     mse_rom = amr;
+    
   end
