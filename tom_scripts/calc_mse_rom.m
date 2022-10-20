@@ -5,23 +5,21 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
     
     if any(convertCharsToStrings(hand) == "un")
         u_zs = output.u_zs; % z-scored trial 
-        u_rom = output.u_rom; % std of unz-scored trial truncated at pinch
+        u_rom = output.u_rom; % ROM: stds of unz-scored trial
         u_rom_max = output.u_rom_max; 
         u_rom_min = output.u_rom_min; 
-        %u_unzs = output.u; % Un-zscored; 
 
     elseif any(convertCharsToStrings(hand) == "aff")
         u_zs = output.a_zs; % z-scored trial
         u_rom = output.a_rom;
         u_rom_max = output.a_rom_max; 
         u_rom_min = output.a_rom_min; 
-        %u_unzs = output.a; % Un-zscored; 
     end
 
     % Load precision data % 
     prec = load([path_to_data 'data' slash 'precision_error_preeya.mat']); 
     
-    % Joint names in accuracy; 
+    % Joint names again from tom's jt_angle_split fcn: 
     % jts 1:12:
     % [eb] = angle_struct.Elbow_Flex(trial{n});
     % [palm] = [palm_abd' palm_flex' palm_prono'];
@@ -40,19 +38,16 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
         assert(length(u_median_zs{m}) == size(u_zs{1, m}, 2)) % make sure size of median makes sense
         
         % Get z-scored params 
-        zsc_mu = output.zsc_mu{m}; 
         zsc_std = output.zsc_std{m};
 
         if m < 12
-            % 95th percentile of precision error; 
-            %max_imprec = prctile(abs(prec.jt_error_all.(jt_names{m})), 95); 
-            %max_imprec = mean(abs(prec.jt_error_all.(jt_names{m}))); 
+            % Get std of error (spread of error)
             max_imprec = std(prec.jt_error_all.(jt_names{m})); 
             
             % z-score: 
             % don't need to subtract mean bc already an error; 
             max_imprec_z = (max_imprec) / zsc_std; 
-            % disp(['Jt ' jt_names{m} ', ' num2str(max_imprec), ': Z : ' num2str(max_imprec_z)])
+            
         else
             max_imprec_z = 0; 
         end 
@@ -65,6 +60,8 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
             med_s2p = u_median_zs{m}; % Median truncated at pinch
             trl_s2p = u_zs{n,m};  % Individual trial trucated at pinch
     
+            % Method to add normally distributed errors (with std of
+            % max_imprec_z) to trl_s2p, and calc MSE; 
             [mse_min, mse_max, mse] = calc_mse_w_error_randsamp(trl_s2p, med_s2p, max_imprec_z); 
             
             u_mse{n,m} = mse; %sqrt(1/length(trl_s2p).*sum(diff_.^2));

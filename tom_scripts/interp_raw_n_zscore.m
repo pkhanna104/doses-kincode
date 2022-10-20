@@ -1,13 +1,19 @@
-function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm,height,input1,sign,hand,on_off, nstd);
+function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm,height,input1,sign,hand,on_off, nstd)
 
 %string to pinch indices obtained using data_height_plot.m and ginput.m
 Filename =  convertStringsToChars(string(strcat(input1,'_st_2_pi_',hand,'.mat')));
 load([path_to_data 'data' slash 'tom_data' slash 'start_2_pinch_data' slash Filename]);
 
 % Load accuracy data for use in ROM calc
+% Jt_names correspond to joints as they are ordered in Tom's
+% "jt_angle_split" fcn
+% [palm] = [palm_abd' palm_flex' palm_prono'];
+% [shoulder_ang] = [shoulder_hor_flex' shoulder_ver_flex' shoulder_roll'];
+% [tb_mcp' tb_dip' ib_mcp' ib_pip' ib_dip' eb' palm shoulder_ang]; % joint angles per trial
 jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...
         'Elbow_Flex', 'Palm_Abd', 'Palm_Flex', 'Palm_Prono', 'Shoulder_HorzFlex',...
         'Shoulder_VertFlex'}; 
+
 acc = load([path_to_data 'data' slash 'rom_error_preeya.mat']); 
 
 if any(convertCharsToStrings(hand) == "un")
@@ -19,7 +25,6 @@ end
 for n = 1:10
     %start to end of pinch trial length
     %st_2_pi is rounded because ginput selects decimal values 
-
     trial_lengths(n) = round(st_2_pi{n}(2,1))-round(st_2_pi{n}(1,1)); 
 end
 
@@ -62,15 +67,15 @@ for n = 1:10 % Trials
     end
     
     %interpolate original angle data and zscored data to have same length as
-    %median trial length.  u_rom is std of each trial/each joint , u_rom_2_pinch
-    % is std of each trial/joint from start to end of   %pinch task
+    %median trial length.  
+    
     for m = 1:12 % joint angles
         u_o = unaffect_all{1,n}(:,m);
         u_new = u_o(indices);  %raw joint angle data from trial start to trial end
         u{n,m} = interp1(t0,u_new,t1); %interpolated raw joint angle data to be used for zscoring, same length median trial
         
         % For ROM calculate based on u
-        if m < 12
+        if m < 12 % ignore shoulder roll -- no error data saved for this; 
             [rom_min, rom_max, rom] = calc_rom_w_error(u{n,m}, acc.accuracy_data.(jt_names{m}), nstd); 
         else % Shoulder roll; 
             rom = std(u{n, m}); 
@@ -95,6 +100,8 @@ for m = 1:12
     
     % mean / std for joint: %
     jt_data = cell2mat(u(:, m));  %u same length median trial
+
+    % Turn this data into a concatenated row: 
     resh_jt_data = reshape(jt_data, [1, size(jt_data, 1)*size(jt_data, 2)]); 
     
     mu{m} = mean(resh_jt_data); 
