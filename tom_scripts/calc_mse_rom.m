@@ -65,7 +65,7 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
             med_s2p = u_median_zs{m}; % Median truncated at pinch
             trl_s2p = u_zs{n,m};  % Individual trial trucated at pinch
     
-            [mse_min, mse_max, mse] = calc_mse_w_error(trl_s2p, med_s2p, max_imprec_z); 
+            [mse_min, mse_max, mse] = calc_mse_w_error_randsamp(trl_s2p, med_s2p, max_imprec_z); 
             
             u_mse{n,m} = mse; %sqrt(1/length(trl_s2p).*sum(diff_.^2));
             u_mse_min{n, m} = mse_min; 
