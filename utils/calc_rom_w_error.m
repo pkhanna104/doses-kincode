@@ -16,13 +16,11 @@ for i = 1:N
     df2 = ((jt(i) - std_acc) - mn).^2;
 
     rom_ = rom_ + df;
-    if df1 > df2
-        rom_max_ = rom_max_ + df1; % add bigger one to max (df1)
-        rom_min_ = rom_min_ + df2;
-    else
-        rom_max_ = rom_max_ + df2; % add bigger one to max (df2)
-        rom_min_ = rom_min_ + df1;
-    end
+
+    opts = [df, df1, df2]; 
+    [~, ix_sort] = sort(opts); % sort in ascending order 
+    rom_max_ = rom_max_ + opts(ix_sort(3)); 
+    rom_min_ = rom_min_ + opts(ix_sort(1)); 
 end
 
 rom = sqrt(rom_/(N-1));
@@ -35,12 +33,6 @@ end
 rom_min = sqrt(rom_min_/(N-1));
 rom_max = sqrt(rom_max_/(N-1));
 
-if rom_max <= rom_min
-    keyboard
-end
-
-if rom_min > rom
-    rom_min = rom; 
-end
-
+assert(rom_min<= rom)
+assert(rom<= rom_max)
 
