@@ -24,14 +24,16 @@ end
 subject = {'B8M','S13J_small','B12J','C9K','W16H_small','R15J_small',...
     'AV_ctrl', 'FR_ctrl', 'PK_ctrl', 'SB_ctrl'};
 
-%%% Save out params 1       2          3    4     5     6 
-% Column 1 -- subject ID
-% Column 2 -- control subject? 1=yes, 0=no
-% Column 3 -- joint number (#1-11)
-% Column 4 -- affected hand? 1=yes, 0=no (for controls affected=L, unaff=R)
-% Column 5 -- [mse_min, mse, mse_max]; 
-% Column 6 -- [rom_min, rom, rom_max]; 
 datatable = {}; 
+% Create a datatable where each row is a datapoint 
+% Columns of the datatable are: 
+% Column 1 -- subject ID (string)
+% Column 2 -- control subject? 1=yes, 0=no (integer)
+% Column 3 -- joint number (#1-11) (integer) 
+% Column 4 -- affected hand? 1=yes, 0=no (for controls affected=L, unaff=R)
+% Column 5 -- [mse_min, mse, mse_max]; (array) 
+% Column 6 -- [rom_min, rom, rom_max]; (array) 
+
 
 %% Load data from each subject
 for i_s = 1:length(subject)

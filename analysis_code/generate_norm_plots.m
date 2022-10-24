@@ -10,6 +10,8 @@ clear;
 % Column 5 -- [mse_min, mse, mse_max]; 
 % Column 6 -- [rom_min, rom, rom_max];
 nstd = 0.5; 
+
+% Assume you're in the doses-kincode directory: 
 load(['data/datatable' num2str(nstd) 'std_acc_samp_prec.mat'])
 
 %% Get out mse_norm and rom_norm
@@ -73,6 +75,7 @@ end
 
 % Plot datapoints 
 ix1 = find(id_==1); % affected
+ix2 = find(id_==2); %unaffected
 ix3 = find(id_==3); % ctrls 
 
 %% Plot 1 -- only mean, by joint category
@@ -80,21 +83,26 @@ figure; hold all;
 ax = subplot(1,1,1); 
 
 for i=1:11
-    if i<=5
+    if i<=5 % distal joints 
         mark = 's';
-    elseif i==6
+    elseif i==6 % elbow 
         mark = 'o'; 
-    elseif i<=9
+    elseif i<=9 % palm 
         mark = 'h'; 
-    elseif i<=11
+    elseif i<=11 % shoulder
         mark = 'd'; 
     end
     ix_jt1 = find(jt_(ix1) == i); 
     ix_jt3 = find(jt_(ix3) == i); 
     
+    % Affected (red) 
     plot(rom_norm(ix1(ix_jt1), 2), mse_norm(ix1(ix_jt1), 2), mark, 'MarkerSize',10, 'Color', 'r')
+
+    % Unaffected (black)
     plot(rom_norm(ix3(ix_jt3), 2), mse_norm(ix3(ix_jt3), 2), mark, 'MarkerSize',10, 'Color', 'k')  
 end
+
+% Confidence ellipse 
 [~] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
     rom_norm(ix1, 2), mse_norm(ix1, 2));
 
@@ -104,6 +112,7 @@ ax = subplot(1,1,1);
 
 % Plot dots 
 plot(rom_norm(ix1, 2), mse_norm(ix1, 2), 'r.', 'MarkerSize',15)
+plot(rom_norm(ix2, 2), mse_norm(ix2, 2), 'b.', 'MarkerSize',15)
 
 % Plot errorbars
 for i = 1:length(ix1)
