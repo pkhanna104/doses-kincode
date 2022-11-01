@@ -41,7 +41,8 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
         zsc_std = output.zsc_std{m};
 
         if m < 12
-            % Get std of error (spread of error)
+            % Get std of error (spread of error) --> used to adjust random
+            % normal distribution that is added to data 
             max_imprec = std(prec.jt_error_all.(jt_names{m})); 
             
             % z-score: 
