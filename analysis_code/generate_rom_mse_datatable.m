@@ -9,7 +9,6 @@ clear;clc;close all;
 % the task-ROM is approx 1/2 of the angle validation ROM; Since accuracy 
 % error is mostly from hysteresis, half the ROM should mean half the error
 % Would like some validation on whether this argument makes sense; 
-nstd = 0.5;
 
 if ismac % Preeya computer
     path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/';
@@ -70,7 +69,7 @@ for i_s = 1:length(subject)
     data_height_plot(data_palm,u_height, u_time,sign,input1,'un','off');
     
     %does inerpolation and calculation of 
-    [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm, u_height, input1,sign,'un','off',nstd);  
+    [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm, u_height, input1,sign,'un','off');  
     
     % Plot 
     for m = 1:12
@@ -102,7 +101,7 @@ for i_s = 1:length(subject)
     data_height_plot(aff_data_palm,a_height, a_time,sign,input1,'aff','off');
     
     %below function same as above but for affected.  Also plots fig 6
-    [aff_output]  = interp_raw_n_zscore(path_to_data,slash,a_time,affect_all,aff_data_palm, a_height, input1, sign,'aff','off',nstd);
+    [aff_output]  = interp_raw_n_zscore(path_to_data,slash,a_time,affect_all,aff_data_palm, a_height, input1, sign,'aff','off');
     
     %tb_mcp' tb_dip' ib_mcp' ib_pip' ib_dip' eb' palm shoulder_ang
     jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...
@@ -130,11 +129,18 @@ for i_s = 1:length(subject)
         u_ROM = [mse_rom.u_median_rom_min(m),     mse_rom.u_median_rom(m),     mse_rom.u_median_rom_max(m)];
         a_ROM = [aff_mse_rom.a_median_rom_min(m), aff_mse_rom.a_median_rom(m), aff_mse_rom.a_median_rom_max(m)];
 
-        %%% Save everything out
-        %                            1      2       3    4    5         6
-        %                       subject,  control?, jt, aff?, mse,    rom,
-        datatable{end+1} = {subject(i_s), ctrl,     m,  0,    u_MSE, u_ROM};
-        datatable{end+1} = {subject(i_s), ctrl,     m,  1,    a_MSE, a_ROM};
+        % Skip saving R15J index DIP: 
+        if m == 12 
+            disp('Skipping Shoulder roll')
+        elseif and(contains(subject{i_s}, 'R15J'), contains(jt_names{m}, 'Index_DIP'))
+            disp('Skipping R15J DIP')
+        else
+            %%% Save everything out
+            %                            1      2       3    4    5         6
+            %                       subject,  control?, jt, aff?, mse,    rom,
+            datatable{end+1} = {subject(i_s), ctrl,     m,  0,    u_MSE, u_ROM};
+            datatable{end+1} = {subject(i_s), ctrl,     m,  1,    a_MSE, a_ROM};
+        end
     end
 end
 
@@ -146,7 +152,8 @@ for m = 1:11
 end
 
 % Save datatable
-save(['data/datatable' num2str(nstd) 'std_acc_samp_prec.mat'], 'datatable')
+%save(['data/datatable' num2str(nstd) 'std_acc_samp_prec.mat'], 'datatable')
+save('data/datatable_boot_acc_samp_prec.mat', 'datatable')
 
 %% Plot showing range of angles measured vs. actual range exerted during the task
 jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...

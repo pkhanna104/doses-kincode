@@ -1,4 +1,4 @@
-function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm,height,input1,sign,hand,on_off, nstd)
+function [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm,height,input1,sign,hand,on_off)
 
 %string to pinch indices obtained using data_height_plot.m and ginput.m
 Filename =  convertStringsToChars(string(strcat(input1,'_st_2_pi_',hand,'.mat')));
@@ -14,7 +14,10 @@ jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...
         'Elbow_Flex', 'Palm_Abd', 'Palm_Flex', 'Palm_Prono', 'Shoulder_HorzFlex',...
         'Shoulder_VertFlex'}; 
 
-acc = load([path_to_data 'data' slash 'rom_error_preeya.mat']); 
+%acc = load([path_to_data 'data' slash 'rom_error_preeya.mat']);
+
+% Load ROM bootstrap 
+boots = load([path_to_data 'data' slash 'bootstrapped_roms.mat']); 
 
 if any(convertCharsToStrings(hand) == "un")
     fn3 = 3;
@@ -76,7 +79,10 @@ for n = 1:10 % Trials
         
         % For ROM calculate based on u
         if m < 12 % ignore shoulder roll -- no error data saved for this; 
-            [rom_min, rom_max, rom] = calc_rom_w_error(u{n,m}, acc.accuracy_data.(jt_names{m}), nstd); 
+            min_ratio = boots.jt_rom_ratio_range.(jt_names{m})(1); 
+            max_ratio = boots.jt_rom_ratio_range.(jt_names{m})(2); 
+            [rom_min, rom_max, rom] =  calc_rom_w_bootstrapped_error(u{n,m}, min_ratio, max_ratio); 
+
         else % Shoulder roll; 
             rom = std(u{n, m}); 
             rom_min = rom; 

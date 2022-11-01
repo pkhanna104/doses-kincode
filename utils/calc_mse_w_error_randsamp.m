@@ -18,10 +18,10 @@ for i = 1:1000
     mse_rand = [mse_rand, mse_]; 
 end
 
-% Get std of errors: 
+% Get std of errors -- +/- 1.96*std is 95% interval
 mse_std = std(mse_rand); 
-mse_min = mse_true - mse_std; 
-mse_max = mse_true + mse_std; 
+mse_min = mse_true - 1.96*mse_std; 
+mse_max = mse_true + 1.96*mse_std; 
 
 
 % MSE equation 
