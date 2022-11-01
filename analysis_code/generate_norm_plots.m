@@ -9,10 +9,12 @@ clear;
 % Column 4 -- affected hand? 1=yes, 0=no (for controls affected=L, unaff=R)
 % Column 5 -- [mse_min, mse, mse_max]; 
 % Column 6 -- [rom_min, rom, rom_max];
-nstd = 0.5; 
+
 
 % Assume you're in the doses-kincode directory: 
-load(['data/datatable' num2str(nstd) 'std_acc_samp_prec.mat'])
+%nstd = 0.5; 
+%load(['data/datatable' num2str(nstd) 'std_acc_samp_prec.mat'])
+load('data/datatable_boot_acc_samp_prec.mat')
 
 %% Get out mse_norm and rom_norm
 mse_norm = []; % N x 3 
@@ -82,6 +84,21 @@ ix3 = find(id_==3); % ctrls
 figure; hold all; 
 ax = subplot(1,1,1); 
 
+% Which data to consider "abnormal" 
+load('data/norm_abn_pat_indices.mat', 'save_indices'); 
+
+% key options : 
+% 'all_patients', -- all patients' affected jts regardless of whether in the 
+% %                   'normal ellipse' or not are used to make
+%                       joint-specific ellipses (not used) 
+% 'all_mean_outside_ellipse_patients' -- if the mean of the patient / joint
+%                       is outside the ellipse, then use this to make joint
+%                       specific ellipses (used for fig 2) 
+% 'all_error_outside_ellipse_patients' -- if the mean and ALL the error
+%                        bars are outside the ellipse, then use this to 
+%                        make joint specific ellipses (used for supp fig 3)
+abnormal_key = 'all_mean_outside_ellipse_patients'; 
+
 % light to dark 
 %colors_p = {[253,204,138],[252,141,89],[227,74,51],[179,0,0]};
 colors_p = {[228,26,28],[55,126,184],[77,175,74],[152,78,163]}; 
@@ -121,7 +138,7 @@ for i=1:11
 end
 
 % Confidence ellipse 
-[in_out_ellipse] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
+[~] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
     rom_norm(ix1, 2), mse_norm(ix1, 2));
 
 % Also plot confidence ellipses for abnormal distal/wrist/elbow/shoulder
@@ -129,6 +146,9 @@ ellipse_data = {};
 for c = 1:4
     ellipse_data{c} = []; 
 end
+
+% Which jts are abnormal; 
+abn_jts = save_indices.(abnormal_key); 
 
 for i=1:11
     if i<=5 % distal joints 
@@ -141,15 +161,13 @@ for i=1:11
         c = 4; % category 4 -- wrist
     end
     
+    
     % Get joints
-    ix_jt1 = find(jt_(ix1) == i); 
-
-    % of these, which are ABNORMAL (out of ellipse)
-    ix_jt1_1 = find(in_out_ellipse(ix_jt1) == 1); 
+    ix_jt1 = find(jt_(abn_jts) == i); 
 
     % save data for ellipse making later 
     ellipse_data{c} = [ellipse_data{c};...
-        [rom_norm(ix1(ix_jt1(ix_jt1_1)), 2) mse_norm(ix1(ix_jt1(ix_jt1_1)), 2)]]; 
+        [rom_norm(abn_jts(ix_jt1), 2) mse_norm(abn_jts(ix_jt1), 2)]]; 
 end
 
 for c = 1:4
@@ -165,18 +183,30 @@ ax = subplot(1,1,1);
 
 % Plot dots 
 plot(rom_norm(ix1, 2), mse_norm(ix1, 2), 'r.', 'MarkerSize',15)
-plot(rom_norm(ix2, 2), mse_norm(ix2, 2), 'b.', 'MarkerSize',15)
+plot(rom_norm(ix2, 2), mse_norm(ix2, 2), '.', 'MarkerSize',15, 'Color', [100, 148, 165]/256)
 
 % Plot errorbars
-for i = 1:length(ix1)
-    plot([rom_norm(ix1(i), 1), rom_norm(ix1(i), 3)],...
-         [mse_norm(ix1(i), 2), mse_norm(ix1(i), 2)], 'r-', 'MarkerSize',15)
-    plot([rom_norm(ix1(i), 2), rom_norm(ix1(i), 2)],...
-         [mse_norm(ix1(i), 1), mse_norm(ix1(i), 3)], 'r-', 'MarkerSize',15)
-end
+% for i = 1:length(ix1)
+%     plot([rom_norm(ix1(i), 1), rom_norm(ix1(i), 3)],...
+%          [mse_norm(ix1(i), 2), mse_norm(ix1(i), 2)], 'r-', 'MarkerSize',15)
+%     plot([rom_norm(ix1(i), 2), rom_norm(ix1(i), 2)],...
+%          [mse_norm(ix1(i), 1), mse_norm(ix1(i), 3)], 'r-', 'MarkerSize',15)
+% end
 
 % Plot control subjects 
 plot(rom_norm(ix3, 2), mse_norm(ix3, 2), 'k.', 'MarkerSize',15)  
+
+% Plot errorbars for normals
+% for i = 1:length(ix3)
+%     plot([rom_norm(ix3(i), 1), rom_norm(ix3(i), 3)],...
+%          [mse_norm(ix3(i), 2), mse_norm(ix3(i), 2)], 'k-', 'MarkerSize',15)
+%     plot([rom_norm(ix3(i), 2), rom_norm(ix3(i), 2)],...
+%          [mse_norm(ix3(i), 1), mse_norm(ix3(i), 3)], 'k-', 'MarkerSize',15)
+% end
+
+% Confidence ellipse 
+[~] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
+    rom_norm(ix1, 2), mse_norm(ix1, 2));
 
 % Labels 
 xlabel('Norm ROM')
@@ -222,8 +252,14 @@ ix_med = find(test_result == 1);
 % All points 
 ix_all = 1:length(test_result); 
 
-% Plot median plots for ROM/MSE for distal
+% Save these indices
+% save_indices = struct(); 
+% save_indices.('all_patients') = ix1; 
+% save_indices.('all_mean_outside_ellipse_patients') = ix1(ix_med); 
+% save_indices.('all_error_outside_ellipse_patients') = ix1(ix_abn); 
+% save('data/norm_abn_pat_indices.mat', 'save_indices')
 
+% Plot median plots for ROM/MSE for distal
 % Jt indices to count as distal/palm/elb/shouder
 dist_ix = 1:5; 
 palm_ix = 7:9;
@@ -304,13 +340,18 @@ end
 %% Plot 4 -- plot out bar plot with stars for sig / non-signifcant comparisons to control data 
 figure; 
 
-mets_patient = {rom_norm(ix1, 2), mse_norm(ix1, 2)}; 
+% doing this to avoid needing to index by ix1 (bc already done in
+% "norm_abn_pat_indices.mat" 
+mets_patient = {rom_norm(:, 2), mse_norm(:, 2)}; 
+
+% still want to index by ix3; 
 mets_control = {rom_norm(ix3, 2), mse_norm(ix3, 2)}; 
 mets_label = {'ROM norm', 'MSE norm'}; 
 
 % Joint labels 
-jts_p = jt_(ix1); 
+jts_p = jt_; 
 jts_c = jt_(ix3); 
+jt_labels = {'Distal', 'Wrist', 'Elbow', 'Shoulder'}; 
 
 % Jt indices to count as distal/palm/elb/shouder
 dist_ix = 1:5; % index/thumb
@@ -321,7 +362,25 @@ shoul_ix = 10:11; % shoulder
 inds = {dist_ix, palm_ix, elb_ix, shoul_ix}; 
 
 % any patient w/ mean outside ellipse, all patients
-lev_ix = {ix_med};%, ix_all}; 
+%lev_ix = {ix_med};%, ix_all}; 
+
+% Which data to consider "abnormal" 
+load('data/norm_abn_pat_indices.mat', 'save_indices'); 
+
+% key options : 
+% 'all_patients', -- all patients' affected jts regardless of whether in the 
+% %                   'normal ellipse' or not are used to make
+%                       joint-specific ellipses (not used) 
+% 'all_mean_outside_ellipse_patients' -- if the mean of the patient / joint
+%                       is outside the ellipse, then use this to make joint
+%                       specific ellipses (used for fig 2) 
+% 'all_error_outside_ellipse_patients' -- if the mean and ALL the error
+%                        bars are outside the ellipse, then use this to 
+%                        make joint specific ellipses (used for supp fig 3)
+abnormal_key = 'all_error_outside_ellipse_patients'; 
+lev_ix = {save_indices.(abnormal_key)}; 
+
+
 lev_color = {'r'};%,'b'}; 
 lev_label = {'abn-pt'};%, 'all-pt'}; 
 linecolor = [.5, .5, .5]; 
