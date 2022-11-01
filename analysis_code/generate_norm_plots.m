@@ -82,29 +82,82 @@ ix3 = find(id_==3); % ctrls
 figure; hold all; 
 ax = subplot(1,1,1); 
 
+% light to dark 
+%colors_p = {[253,204,138],[252,141,89],[227,74,51],[179,0,0]};
+colors_p = {[228,26,28],[55,126,184],[77,175,74],[152,78,163]}; 
+
+% light to dark 
+%colors_c = {[.8, .8, .8], [.6, .6, .6], [.4, .4, .4], [.2, .2, .2]}; 
+%colors_c = colors_p; 
+
 for i=1:11
     if i<=5 % distal joints 
-        mark = 's';
+        %mark = 's';
+        c = 1; % category 1 
     elseif i==6 % elbow 
-        mark = 'o'; 
+        %mark = 'o'; 
+        c = 3; % category 3 -- elbow 
     elseif i<=9 % palm 
-        mark = 'h'; 
+        %mark = 'h'; 
+        c = 2; % category 2 -- wrist 
     elseif i<=11 % shoulder
-        mark = 'd'; 
+        %mark = 'd'; 
+        c = 4; % category 4 -- wrist
     end
     ix_jt1 = find(jt_(ix1) == i); 
+    ix_jt2 = find(jt_(ix2) == i); 
     ix_jt3 = find(jt_(ix3) == i); 
     
     % Affected (red) 
-    plot(rom_norm(ix1(ix_jt1), 2), mse_norm(ix1(ix_jt1), 2), mark, 'MarkerSize',10, 'Color', 'r')
+    n = length(ix_jt1); 
+    scatter(rom_norm(ix1(ix_jt1), 2), mse_norm(ix1(ix_jt1), 2), 100, repmat(colors_p{c}/256, [n, 1]), 'filled');
 
-    % Unaffected (black)
-    plot(rom_norm(ix3(ix_jt3), 2), mse_norm(ix3(ix_jt3), 2), mark, 'MarkerSize',10, 'Color', 'k')  
+    % Control (black) 
+    n = length(ix_jt3); 
+    scatter(rom_norm(ix3(ix_jt3), 2), mse_norm(ix3(ix_jt3), 2), 50, 'k', 'filled', 'MarkerFaceAlpha', .5);  
+
+    % Unaffected (blue)-- remove this for now 
+    %scatter(rom_norm(ix2(ix_jt2), 2), mse_norm(ix2(ix_jt2), 2), 100, 'b', 'filled', mark)  
 end
 
 % Confidence ellipse 
-[~] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
+[in_out_ellipse] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
     rom_norm(ix1, 2), mse_norm(ix1, 2));
+
+% Also plot confidence ellipses for abnormal distal/wrist/elbow/shoulder
+ellipse_data = {}; 
+for c = 1:4
+    ellipse_data{c} = []; 
+end
+
+for i=1:11
+    if i<=5 % distal joints 
+        c = 1; % category 1 
+    elseif i==6 % elbow 
+        c = 3; % category 3 -- elbow 
+    elseif i<=9 % palm 
+        c = 2; % category 2 -- wrist 
+    elseif i<=11 % shoulder
+        c = 4; % category 4 -- wrist
+    end
+    
+    % Get joints
+    ix_jt1 = find(jt_(ix1) == i); 
+
+    % of these, which are ABNORMAL (out of ellipse)
+    ix_jt1_1 = find(in_out_ellipse(ix_jt1) == 1); 
+
+    % save data for ellipse making later 
+    ellipse_data{c} = [ellipse_data{c};...
+        [rom_norm(ix1(ix_jt1(ix_jt1_1)), 2) mse_norm(ix1(ix_jt1(ix_jt1_1)), 2)]]; 
+end
+
+for c = 1:4
+    [~] = plot_conf_ellipse(ax, ellipse_data{c}(:, 1),...
+        ellipse_data{c}(:, 2), colors_p{c}/256,...
+        [], [], 75);
+end
+
 
 %% Plot 2 -- mean and error bars
 figure; hold all; 
@@ -178,6 +231,7 @@ elb_ix = 6;
 shoul_ix = 10:11; 
 
 inds = {dist_ix, palm_ix, elb_ix, shoul_ix}; 
+jt_labels = {'Distal', 'Wrist', 'Elbow', 'Shoulder'}; 
 
 % Same markers as Tom's Fig2 plot for distal/palm/elb/shouder
 marker = {'s', 'h', 'o', 'd'}; 
@@ -246,3 +300,95 @@ for met = 1:2
     xlabel(['Norm ' met_label{met}])
     ylim([0, 4]); 
 end
+
+%% Plot 4 -- plot out bar plot with stars for sig / non-signifcant comparisons to control data 
+figure; 
+
+mets_patient = {rom_norm(ix1, 2), mse_norm(ix1, 2)}; 
+mets_control = {rom_norm(ix3, 2), mse_norm(ix3, 2)}; 
+mets_label = {'ROM norm', 'MSE norm'}; 
+
+% Joint labels 
+jts_p = jt_(ix1); 
+jts_c = jt_(ix3); 
+
+% Jt indices to count as distal/palm/elb/shouder
+dist_ix = 1:5; % index/thumb
+palm_ix =7:9;% palm abd / flex / prono
+elb_ix = 6; % elbow 
+shoul_ix = 10:11; % shoulder 
+
+inds = {dist_ix, palm_ix, elb_ix, shoul_ix}; 
+
+% any patient w/ mean outside ellipse, all patients
+lev_ix = {ix_med};%, ix_all}; 
+lev_color = {'r'};%,'b'}; 
+lev_label = {'abn-pt'};%, 'all-pt'}; 
+linecolor = [.5, .5, .5]; 
+controlface = [.2, .2, .2]; 
+alphas = {.8, .4}; 
+
+for met = 1:2
+
+    subplot(1, 2, met); hold all; 
+    ax = gca; 
+
+    % index into right metric 
+    met_p = mets_patient{met}; 
+    met_c = mets_control{met}; 
+
+    % for each patient level: 
+    for level = 1:1 
+
+        mt_lev_p = met_p(lev_ix{level}); 
+        jt_lev_p = jts_p(lev_ix{level}); 
+
+        for cat = 1:4
+            
+            % which joints are acceptable 
+            keep_p = []; 
+            keep_c = []; 
+
+            % Aggregate joints 
+            for j = 1:length(inds{cat})
+                tmp = find(jt_lev_p==inds{cat}(j)); 
+                keep_p = [keep_p tmp]; 
+
+                tmp2 = find(jts_c == inds{cat}(j)); 
+                keep_c = [keep_c tmp2]; 
+            end
+
+            % Plot boxplot for controls  
+            if level == 1
+                draw_boxplot(ax, cat, met_c(keep_c), linecolor, controlface, 0.5)
+            end
+    
+            % patients 
+            draw_boxplot(ax, cat + (level*.3), mt_lev_p(keep_p),...
+                linecolor, colors_p{cat}/256, alphas{level}); 
+
+            % control vs. patient bar 
+            if level == 1
+                p = ranksum(met_c(keep_c), mt_lev_p(keep_p)); 
+                disp(['Metric ' mets_label{met}]); 
+                disp(['Jt cat : ' jt_labels{cat}]); 
+                disp(['Level: ' num2str(level)])
+                disp(['p = ' num2str(p) ', Np = ' num2str(length(keep_p)) ', Nc = ' num2str(length(keep_c))]); 
+                disp(' ')
+                disp(' ')
+
+                if p < 0.05
+                    plot(cat + .15, max([max(met_c(keep_c)) max(mt_lev_p(keep_p))]), 'k*')
+                end
+            end
+
+        end
+    end
+
+    xlabel('Joint Categories')
+    xticks([1:4] + .25)
+    xticklabels(jt_labels)
+    ylabel(mets_label{met})
+
+end
+
