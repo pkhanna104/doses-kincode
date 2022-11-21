@@ -100,16 +100,14 @@ load('data/norm_abn_pat_indices.mat', 'save_indices');
 % 'all_error_outside_ellipse_patients' -- if the mean and ALL the error
 %                        bars are outside the ellipse, then use this to 
 %                        make joint specific ellipses (used for supp fig 3)
-abnormal_key = 'all_mean_outside_ellipse_patients'; 
+abnormal_key = 'all_patients'; 
 
 % light to dark 
 %colors_p = {[253,204,138],[252,141,89],[227,74,51],[179,0,0]};
-colors_p = {[228,26,28],[55,126,184],[77,175,74],[152,78,163]}; 
+%colors_p = {[228,26,28],[55,126,184],[77,175,74],[152,78,163]}; 
+colors_p = {[237, 32, 36], [28, 117, 188] [118, 172, 66], [127, 47, 141]}; % R/B/G/purple
 
-% light to dark 
-%colors_c = {[.8, .8, .8], [.6, .6, .6], [.4, .4, .4], [.2, .2, .2]}; 
-%colors_c = colors_p; 
-
+% Plot points w/ colors
 for i=1:11
     if i<=5 % distal joints 
         %mark = 's';
@@ -130,11 +128,11 @@ for i=1:11
     
     % Affected (red) 
     n = length(ix_jt1); 
-    scatter(rom_norm(ix1(ix_jt1), 2), mse_norm(ix1(ix_jt1), 2), 100, repmat(colors_p{c}/256, [n, 1]), 'filled');
+    scatter(rom_norm(ix1(ix_jt1), 2), mse_norm(ix1(ix_jt1), 2), 50, repmat(colors_p{c}/256, [n, 1]), 'filled', 'MarkerFaceAlpha', .5);
 
     % Control (black) 
     n = length(ix_jt3); 
-    scatter(rom_norm(ix3(ix_jt3), 2), mse_norm(ix3(ix_jt3), 2), 50, 'k', 'filled', 'MarkerFaceAlpha', .5);  
+    scatter(rom_norm(ix3(ix_jt3), 2), mse_norm(ix3(ix_jt3), 2), 50, 'k', 'filled');  
 
     % Unaffected (blue)-- remove this for now 
     %scatter(rom_norm(ix2(ix_jt2), 2), mse_norm(ix2(ix_jt2), 2), 100, 'b', 'filled', mark)  
@@ -179,41 +177,41 @@ for c = 1:4
         [], [], 75);
 end
 
+xlabel('Norm ROM')
+ylabel('Norm T2TV')
+xlim([-1, 4])
+ylim([-1, 4])
+set(gcf, 'Position', [0, 0, 400, 400])
+saveas(gcf, ['figs/normROMvMSE_byJtCat.svg'])
 
 %% Plot 2 -- affected/unaffected plus ellipse 
 figure; hold all; 
 ax = subplot(1,1,1); 
+blue = [100, 148, 165]/256; 
+
 
 % Plot dots 
 plot(rom_norm(ix1, 2), mse_norm(ix1, 2), 'r.', 'MarkerSize',15)
-plot(rom_norm(ix2, 2), mse_norm(ix2, 2), '.', 'MarkerSize',15, 'Color', [100, 148, 165]/256)
-
-% Plot errorbars
-% for i = 1:length(ix1)
-%     plot([rom_norm(ix1(i), 1), rom_norm(ix1(i), 3)],...
-%          [mse_norm(ix1(i), 2), mse_norm(ix1(i), 2)], 'r-', 'MarkerSize',15)
-%     plot([rom_norm(ix1(i), 2), rom_norm(ix1(i), 2)],...
-%          [mse_norm(ix1(i), 1), mse_norm(ix1(i), 3)], 'r-', 'MarkerSize',15)
-% end
+plot(rom_norm(ix2, 2), mse_norm(ix2, 2), '.', 'MarkerSize',15, 'Color', blue)
 
 % Plot control subjects 
 plot(rom_norm(ix3, 2), mse_norm(ix3, 2), 'k.', 'MarkerSize',15)  
-
-% Plot errorbars for normals
-% for i = 1:length(ix3)
-%     plot([rom_norm(ix3(i), 1), rom_norm(ix3(i), 3)],...
-%          [mse_norm(ix3(i), 2), mse_norm(ix3(i), 2)], 'k-', 'MarkerSize',15)
-%     plot([rom_norm(ix3(i), 2), rom_norm(ix3(i), 2)],...
-%          [mse_norm(ix3(i), 1), mse_norm(ix3(i), 3)], 'k-', 'MarkerSize',15)
-% end
 
 % Confidence ellipse 
 [~] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
     rom_norm(ix1, 2), mse_norm(ix1, 2));
 
+% [~] = plot_conf_ellipse(ax, rom_norm(ix1, 2), mse_norm(ix1, 2),'r',...
+%     rom_norm(ix1, 2), mse_norm(ix1, 2));
+% 
+% [~] = plot_conf_ellipse(ax, rom_norm(ix2, 2), mse_norm(ix2, 2),blue,...
+%     rom_norm(ix1, 2), mse_norm(ix1, 2));
+
 % Labels 
 xlabel('Norm ROM')
-ylabel('Norm MSE')
+ylabel('Norm T2TV')
+set(gcf, 'Position', [0, 0, 400, 400])
+saveas(gcf, ['figs/normROMvMSE_wAffUnaffCtrl.svg'])
 
 %% Plot 2.5 -- normal / patients for individual joints
 jts_ids = [5, 6, 10]; % from generate_fig2
@@ -252,11 +250,11 @@ for i_j = 1:length(jts_ids)
     ylim([-1, 3.5])
 
     % save 
-    set(gcf, 'Position', [0, 0, 400, 400])
+    set(gcf, 'Position', [0, 0, 300, 300])
     title(jt_nms{i_j})
     xlabel('Norm. ROM')
     ylabel('Norm. T2TV')
-    saveas(figure(jt), ['figs/jt_id' num2str(jts_ids(i_j)) '_normROMvMSE.svg'])
+    saveas(figure(i_j), ['figs/jt_id' num2str(jts_ids(i_j)) '_normROMvMSE.svg'])
 
 end
 
@@ -394,7 +392,7 @@ mets_patient = {rom_norm(:, 2), mse_norm(:, 2)};
 
 % still want to index by ix3; 
 mets_control = {rom_norm(ix3, 2), mse_norm(ix3, 2)}; 
-mets_label = {'ROM norm', 'MSE norm'}; 
+mets_label = {'Norm ROM', 'Norm T2TV'}; 
 
 % Joint labels 
 jts_p = jt_; 
@@ -425,7 +423,7 @@ load('data/norm_abn_pat_indices.mat', 'save_indices');
 % 'all_error_outside_ellipse_patients' -- if the mean and ALL the error
 %                        bars are outside the ellipse, then use this to 
 %                        make joint specific ellipses (used for supp fig 3)
-abnormal_key = 'all_error_outside_ellipse_patients'; 
+abnormal_key = 'all_patients'; 
 lev_ix = {save_indices.(abnormal_key)}; 
 
 
@@ -437,7 +435,7 @@ alphas = {.8, .4};
 
 for met = 1:2
 
-    subplot(1, 2, met); hold all; 
+    subplot(2, 1, met); hold all; 
     ax = gca; 
 
     % index into right metric 
@@ -467,35 +465,41 @@ for met = 1:2
 
             % Plot boxplot for controls  
             if level == 1
-                draw_boxplot(ax, cat, met_c(keep_c), linecolor, controlface, 0.5)
+                %draw_boxplot(ax, cat, met_c(keep_c), linecolor, controlface, 0.5)
+                draw_violin(ax, cat*2, met_c(keep_c), linecolor, controlface, 0.5)
             end
     
             % patients 
-            draw_boxplot(ax, cat + (level*.3), mt_lev_p(keep_p),...
-                linecolor, colors_p{cat}/256, alphas{level}); 
+            %draw_boxplot(ax, cat + (level*.3), mt_lev_p(keep_p),...
+            %    linecolor, colors_p{cat}/256, alphas{level}); 
+            draw_violin(ax, cat*2 + (level*.6), mt_lev_p(keep_p),...
+                linecolor, colors_p{cat}/256, alphas{level})
 
             % control vs. patient bar 
-            if level == 1
-                p = ranksum(met_c(keep_c), mt_lev_p(keep_p)); 
-                disp(['Metric ' mets_label{met}]); 
-                disp(['Jt cat : ' jt_labels{cat}]); 
-                disp(['Level: ' num2str(level)])
-                disp(['p = ' num2str(p) ', Np = ' num2str(length(keep_p)) ', Nc = ' num2str(length(keep_c))]); 
-                disp(' ')
-                disp(' ')
-
-                if p < 0.05
-                    plot(cat + .15, max([max(met_c(keep_c)) max(mt_lev_p(keep_p))]), 'k*')
-                end
-            end
+%             if level == 1
+%                 p = ranksum(met_c(keep_c), mt_lev_p(keep_p)); 
+%                 disp(['Metric ' mets_label{met}]); 
+%                 disp(['Jt cat : ' jt_labels{cat}]); 
+%                 disp(['Level: ' num2str(level)])
+%                 disp(['p = ' num2str(p) ', Np = ' num2str(length(keep_p)) ', Nc = ' num2str(length(keep_c))]); 
+%                 disp(' ')
+%                 disp(' ')
+% 
+%                 if p < 0.05
+%                     plot(cat + .15, max([max(met_c(keep_c)) max(mt_lev_p(keep_p))]), 'k*')
+%                 end
+%             end
 
         end
     end
 
     xlabel('Joint Categories')
-    xticks([1:4] + .25)
+    xticks([1:2:8] + 1.2)
     xticklabels(jt_labels)
     ylabel(mets_label{met})
+    xlim([.5, 10])
 
 end
 
+set(gcf, 'Position', [0, 0, 300, 400])
+saveas(gcf, ['figs/normROM_normMSE_violins.svg'])
