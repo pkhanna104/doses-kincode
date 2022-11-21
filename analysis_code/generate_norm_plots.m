@@ -21,6 +21,7 @@ mse_norm = []; % N x 3
 rom_norm = []; % N x 5
 jt_ = []; % 1 x N 
 id_ = []; % 1 x N: id: 1=aff, 2=unaff, 3=ctrl
+subj_nm = {}; 
 
 for jt = 1 : 11
     
@@ -35,6 +36,7 @@ for jt = 1 : 11
             rm = datatable{i}{6}; 
             normal_rom = [normal_rom rm(2)]; 
             normal_mse = [normal_mse mse(2)]; 
+            
         end
     end
 
@@ -68,6 +70,7 @@ for jt = 1 : 11
             rom_norm = [rom_norm; (rm  - medROM)/medROM ]; 
             jt_ = [jt_ jt]; 
             id_ = [id_ id_num]; 
+            subj_nm{end+1} = datatable{i}{1}{1}; 
 
         end
     end
@@ -177,7 +180,7 @@ for c = 1:4
 end
 
 
-%% Plot 2 -- mean and error bars
+%% Plot 2 -- affected/unaffected plus ellipse 
 figure; hold all; 
 ax = subplot(1,1,1); 
 
@@ -211,6 +214,51 @@ plot(rom_norm(ix3, 2), mse_norm(ix3, 2), 'k.', 'MarkerSize',15)
 % Labels 
 xlabel('Norm ROM')
 ylabel('Norm MSE')
+
+%% Plot 2.5 -- normal / patients for individual joints
+jts_ids = [5, 6, 10]; % from generate_fig2
+jt_nms = {'Index DIP', 'Elbow Flex/Ext', 'Shoulder Abd/Add'}; 
+
+jt_cols = {[237, 32, 36]/256, [118, 172, 66]/256, [127, 47, 141]/256}; % R/G/purple
+subjects = {'B8M', 'B12J', 'S13J'}; 
+
+for i_j = 1:length(jts_ids)
+    figure(i_j); hold all; 
+
+    % Plot the 'normals' ellipse 
+    ax = gca; 
+    [~] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
+        [], []);
+    
+    % Now plot the individual normal points for this joint; 
+    jix3 = find(jt_(ix3) == jts_ids(i_j));
+    plot(rom_norm(ix3(jix3), 2), mse_norm(ix3(jix3), 2), 'k.','MarkerSize', 20)
+
+    % Now plot the affected patient jts for this joint 
+    jix1 = find(jt_(ix1) == jts_ids(i_j));
+
+    for subj = 1:length(subjects)
+        subjid = subjects{subj}; 
+
+        for j = 1:length(jix1)
+            ogix = ix1(jix1(j)); 
+            if contains(subj_nm{ogix}, subjid)
+                plot(rom_norm(ogix, 2), mse_norm(ogix, 2), '.', 'Color', jt_cols{i_j}, 'MarkerSize', 20)
+                text(rom_norm(ogix, 2), mse_norm(ogix, 2), subjid, 'Color', jt_cols{i_j})
+            end
+        end
+    end
+    xlim([-1, 1.5])
+    ylim([-1, 3.5])
+
+    % save 
+    set(gcf, 'Position', [0, 0, 400, 400])
+    title(jt_nms{i_j})
+    xlabel('Norm. ROM')
+    ylabel('Norm. T2TV')
+    saveas(figure(jt), ['figs/jt_id' num2str(jts_ids(i_j)) '_normROMvMSE.svg'])
+
+end
 
 %% Plot 3 -- Median values for normal, borderline, abnormal points
 % inside or outside the ellipse 
