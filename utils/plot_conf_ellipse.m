@@ -42,14 +42,17 @@ if perc_confidence == 95
     x_dem = std(X_unrot(:, 1))*sqrt(5.991); 
     y_dem = std(X_unrot(:, 2))*sqrt(5.991); 
     linestyle = '-';
+    linewidth = .5; 
 elseif perc_confidence == 90
     x_dem = std(X_unrot(:, 1))*sqrt(4.605); 
     y_dem = std(X_unrot(:, 2))*sqrt(4.605);
     linestyle = '--';
+    linewidth = 1; 
 elseif perc_confidence == 75
     x_dem = std(X_unrot(:, 1))*sqrt(2.77); 
     y_dem = std(X_unrot(:, 2))*sqrt(2.77);
-    linestyle = '--';
+    linestyle = '-';
+    linewidth = 2; 
 end
 % Plot the ellipse
 x_e_opts = -x_dem:.01:x_dem; 
@@ -74,7 +77,7 @@ R_e(:, 1) = R_e(:, 1) + X0;
 R_e(:, 2) = R_e(:, 2) + Y0;
 
 % Plot the coordinates 
-plot(ax, R_e(:,1), R_e(:,2), linestyle, 'Color', col);
+plot(ax, R_e(:,1), R_e(:,2), linestyle, 'Color', col, 'LineWidth', linewidth);
 
 % Test out which points are inside vs outside the ellipse
 
