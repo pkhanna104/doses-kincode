@@ -179,13 +179,21 @@ for i_s = 1:length(subjects)
             if polygon(3, jt_id_order(i_j))
                 [~, id] = min(abs(colormap_ids - polygon(2, jt_id_order(i_j)))); 
                 color = colormap2(id, :); 
+                alpha = 1. 
+                skip = false; 
             else
-                color = [.1, .1, .1]; 
+                % Only R15J index DIP should be here 
+                assert(contains(subjects{i_s}, 'R15J'))
+                assert(jt_id_order(i_j) == 5)
+                skip = true; 
             end
-            plot([0, rad*cos(ang)], [0, rad*sin(ang)], '.', 'Color',...
-                color, 'MarkerSize', 30)
-            plot([0, rad*cos(ang)], [0, rad*sin(ang)], '-', 'Color',...
-                color, 'LineWidth', 3)
+
+            if ~skip
+                plot([0, rad*cos(ang)], [0, rad*sin(ang)], '.', 'Color',...
+                    color, 'MarkerSize', 30)
+                plot([0, rad*cos(ang)], [0, rad*sin(ang)], '-', 'Color',...
+                    color, 'LineWidth', 3)
+            end
         end
         title(subjects{i_s})
 
