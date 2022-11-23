@@ -75,6 +75,7 @@ for n = 1:10 % Trials
     for m = 1:12 % joint angles
         u_o = unaffect_all{1,n}(:,m);
         u_new = u_o(indices);  %raw joint angle data from trial start to trial end
+        u_raw{n, m} = u_new; % raw jt angle, uninterpolated 
         u{n,m} = interp1(t0,u_new,t1); %interpolated raw joint angle data to be used for zscoring, same length median trial
         
         % For ROM calculate based on u
@@ -132,6 +133,7 @@ if any(convertCharsToStrings(hand) == "un")
     unaf.zsc_mu = mu; % zscore parameters 
     unaf.zsc_std = sigma; % zscore parameters 
     unaf.mtl = mtl; %median trial length from start to end of pinch task 
+    unaf.raw = u_raw; % un z-scored uninterpolated trial 
     output = unaf;
     
 elseif any(convertCharsToStrings(hand) == "aff")
@@ -144,6 +146,7 @@ elseif any(convertCharsToStrings(hand) == "aff")
     affe.zsc_mu = mu; % zscore parameters 
     affe.zsc_std = sigma; % zscore parameters 
     affe.mtl = mtl; %median trial length from start to end of pinch task 
+    affe.raw = u_raw; % un z-scored uninterpolated trial 
     output = affe;
 end
 

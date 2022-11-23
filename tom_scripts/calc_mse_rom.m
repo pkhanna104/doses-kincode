@@ -100,6 +100,7 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
     umr.u_median_rom = u_median_rom;
     umr.u_median_rom_min = u_median_rom_min;
     umr.u_median_rom_max = u_median_rom_max; 
+    umr.u_mse = u_mse; 
     mse_rom = umr;
 
   elseif any(convertCharsToStrings(hand) == "aff")
@@ -111,6 +112,7 @@ function [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,hand)
     amr.a_median_rom = u_median_rom;
     amr.a_median_rom_min = u_median_rom_min;
     amr.a_median_rom_max = u_median_rom_max; 
+    amr.a_mse = u_mse; 
     mse_rom = amr;
     
   end
