@@ -49,6 +49,8 @@ xlab = {};
 
 jt_error_all = struct(); 
 % For each joint 
+mns =[]; stds = []; 
+
 for j=1:length(jts)
     newjt = strrep(jts{j},' ','_');
     
@@ -94,6 +96,9 @@ for j=1:length(jts)
     %newjt2 = strrep(newjt, '_', ' '); 
     xlab{end+1} = jt_names{xoff};
     xoff = xoff + 1;
+
+    mns =[mns, mean(jt_error)]; stds = [stds, circStd(jt_error)]; 
+
     
 end
 xticks(1:xoff);
@@ -103,10 +108,15 @@ ylim([-30, 30])
 title('Within session reliability (7 hands, 4 subjects)')
 ylabel('Degrees'); 
 
+disp('Mean error: ')
+disp(mean(mns))
+disp('mean std: ')
+disp(mean(stds))
+
 %saveas(f, 'figs/w_in_session_precision.epsc')
 
 % Save out jt error data 
-save('data/precision_error_preeya.mat', 'jt_error_all'); 
+%save('data/precision_error_preeya.mat', 'jt_error_all'); 
 
 %% Figure 2 -- Repeated subject -- across session var; 
 % % Notes -- don't have task baseline for these subjects 
@@ -852,6 +862,9 @@ tru_cnt = 0;
 xlab0 = {}; 
 xlab = {}; 
 
+mns = []; 
+stds = []; 
+
 for i_j = 1:length(jts)
     newjt = strrep(jts{i_j},' ','_');
     
@@ -872,8 +885,16 @@ for i_j = 1:length(jts)
         set(h,'FaceColor',cols{i_j});
         errorbar(tru_cnt, circMean(errs_d), 1*circStd(errs_d), 'color', 'k');
         xlab{end+1} = jts_label{i_j}; 
+
+        mns = [mns, circMean(errs_d)]; 
+        stds = [stds, circStd(errs_d)]; 
     end
 end
+
+disp('Mean: ')
+disp(circMean(mns))
+disp('Stds: ')
+disp(circMean(stds))
 
 subplot(1, 2, 1); 
 xticks(1:tru_cnt)
