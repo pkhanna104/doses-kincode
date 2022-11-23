@@ -89,19 +89,33 @@ ix3 = find(id_==3); % ctrls
 
 figure(1); 
 ax = gca; 
-in_ellipse = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
-    rom_norm(:, 2), mse_norm(:, 2));
+
+%%% What to consider "normal" %% 
+load('data/norm_abn_pat_indices.mat', 'save_indices')
+inds_outside_ellipse = save_indices.('all_error_outside_ellipse_patients'); 
+% save_indices.('all_patients') = ix1; 
+% save_indices.('all_mean_outside_ellipse_patients') = ix1(ix_med); 
+% save_indices.('all_error_outside_ellipse_patients') = ix1(ix_abn); 
+
+% Make sure these match
+assert(length(ix1) == length(save_indices.('all_patients')))
+for i = 1:length(ix1)
+    assert(ix1(i) == save_indices.('all_patients')(i))
+end
+
 close all; 
 
 %% Fit curve to use for ROM b/w [-1, 1]
-norm_x = [norm_x', ones(length(norm_x), 1)]; 
-b_b0 = norm_x\norm_y'; 
+%norm_x = [norm_x', ones(length(norm_x), 1)]; 
+%b_b0 = norm_x\norm_y'; 
 
 %% Subject specific 
 subjects = unique(subj_nm); 
 jt_id_order = [1:5, 7:9, 6, 10:11];  % distal // wrist // elbow // shoulder 
-colormap2 = copper(256); % black --> red (0 --> 2)
-colormap_ids = linspace(0, 2, 256); 
+
+% black --> copper (0 --> 2)
+colormap2 = copper(256); 
+colormap_ids = linspace(0, 3, 256); 
 
 th = 0:pi/50:2*pi;
 xunit = cos(th);
@@ -112,9 +126,11 @@ for i_s = 1:length(subjects)
     if ~contains(subjects{i_s}, '_ctrl')
         figure(i_s); hold all; 
         colormap(colormap2)
-        % rom // mse for rom // in_ellipse (1=out of ellipse)
+        
+        % rom // mse for rom // 
         polygon = zeros(3, 11); 
     
+        % cycle through subjects %  
         for i = 1:length(subj_nm)
 
             if and(contains(subj_nm{i}, subjects{i_s}), id_(i) == 1)
@@ -125,20 +141,31 @@ for i_s = 1:length(subjects)
                 % Recentered ROM 
                 if rom_norm(i) > 1
                     mse_norm_max = 1; 
-                    polygon(2, jt_(i)) = mse_norm(i, 2) - (b_b0(1)*mse_norm_max + b_b0(2));  
+                    polygon(2, jt_(i)) = mse_norm(i, 2); 
+                    %polygon(2, jt_(i)) = mse_norm(i, 2) - (b_b0(1)*mse_norm_max + b_b0(2));  
                 else
-                    polygon(2, jt_(i)) = mse_norm(i, 2) - (b_b0(1)*mse_norm(i,2)+ b_b0(2)); 
+                    polygon(2, jt_(i)) = mse_norm(i, 2); 
+                    %polygon(2, jt_(i)) = mse_norm(i, 2) - (b_b0(1)*mse_norm(i,2)+ b_b0(2)); 
                 end
 
-                polygon(3, jt_(i)) = in_ellipse(i); % 1 = out // 0 = in 
+                % Edit 11/23/22 -- plot all regardless of 'normal/abnormal'
+                polygon(3, jt_(i)) = 1;
+
+                % 1 = out of ellipse, 0 = in ellipse 
+                % indices in inds_outside_ellipse 
+                %if ~isempty(find(inds_outside_ellipse == i)) % is out of ellipse
+                %    polygon(3, jt_(i)) = 1; % 1 = out // 0 = in 
+                %else
+                %    polygon(3, jt_(i)) = 0; % inside 
+                %end
 
                 % Threshold for ROM 
                 polygon(1, jt_(i)) = min([3, polygon(1, jt_(i))]); % max is 3; 
                 polygon(1, jt_(i)) = max([-1, polygon(1, jt_(i))]); % min is -1; 
                 
                 % Threshold for MSE 
-                polygon(2, jt_(i)) = min([3, polygon(2, jt_(i))]); % max is 3; 
-                polygon(2, jt_(i)) = max([-1, polygon(2, jt_(i))]); % min is -1; 
+                %polygon(2, jt_(i)) = min([3, polygon(2, jt_(i))]); % max is 3; 
+                %polygon(2, jt_(i)) = max([-1, polygon(2, jt_(i))]); % min is -1; 
                 
             end
         end
