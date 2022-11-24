@@ -396,7 +396,6 @@ end
 figure; hold all; 
 ax = subplot(1,1,1); 
 
-
 inds_red = save_indices.('all_error_outside_ellipse_patients') ; 
 
 % Plot errors 
@@ -424,6 +423,45 @@ xlabel('Norm ROM'); xlim([-1, 4])
 ylabel('Norm T2TV'); ylim([-1, 4])
 set(gcf, 'Position', [0, 0, 400, 400])
 saveas(gcf, ['figs/normROMvMSE_wAffUnaffCtrl_werror.svg'])
+
+%% Plot 3.75 -- distributions of ROM and MSE ERROR bars 
+rom_lt_gt = []; % 2 x N of LT / GT 
+mse_lt_gt = []; % 2 x N of LT / GT 
+
+% Plot errors 
+for j = ix1
+    
+    rom_ = rom_norm(j, [1, 3]) - rom_norm(j, 2); 
+    rom_lt_gt = [rom_lt_gt rom_']; 
+
+    mse_ = mse_norm(j, [1, 3]) - mse_norm(j, 2); 
+    mse_lt_gt = [mse_lt_gt mse_']; 
+    
+end
+
+mts = {rom_lt_gt, mse_lt_gt}; 
+mts_lab = {'norm ROM', 'norm T2TV'}; 
+bds = {'Lower', 'Upper'}; 
+for m=1:2
+    met = mts{m}; 
+    figure; hold all; 
+    title(mts_lab{m}); 
+
+    for i = 1:2
+        subplot(1, 2, i); hold all; 
+        [prob,eds] = histcounts(met(i, :), 15, 'Normalization', 'probability'); 
+        eds_plt = eds(1:end-1) + 0.5*(eds(2)-eds(1)); 
+        plot(eds_plt, prob, 'k-', 'LineWidth',1); 
+        mn = mean(met(i, :)); 
+        plot([mn, mn], [0, .4], 'b-', 'LineStyle','--')
+        ylim([0, .4])
+        ylabel('Fraction of Jts')
+        xlabel([bds{i} ' bound of 95% CI for ' mts_lab{m}])
+    end
+    
+    set(gcf, 'Position', [0, 0, 800, 300])
+    saveas(gcf, ['figs/CI_dist_' mts_lab{m} '.svg'])
+end
 
 %% Plot 4 -- plot out violin plot distr of normROM / normMSE vs control
 figure; 
