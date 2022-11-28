@@ -201,10 +201,15 @@ plot(rom_norm(ix2, 2), mse_norm(ix2, 2), '.', 'MarkerSize',15, 'Color', blue)
 % Plot control subjects 
 plot(rom_norm(ix3, 2), mse_norm(ix3, 2), 'k.', 'MarkerSize',15)  
 
-% Confidence ellipse 
-[~] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
+% Confidence ellipse  -- 1 = outside ellipse 
+[in_ellipse_aff] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
     rom_norm(ix1, 2), mse_norm(ix1, 2));
 
+[in_ellipse_unaff] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
+    rom_norm(ix2, 2), mse_norm(ix2, 2));
+
+[in_ellipse_intact] = plot_conf_ellipse(ax, rom_norm(ix3, 2), mse_norm(ix3, 2),'k',...
+    rom_norm(ix3, 2), mse_norm(ix3, 2));
 % [~] = plot_conf_ellipse(ax, rom_norm(ix1, 2), mse_norm(ix1, 2),'r',...
 %     rom_norm(ix1, 2), mse_norm(ix1, 2));
 % 
