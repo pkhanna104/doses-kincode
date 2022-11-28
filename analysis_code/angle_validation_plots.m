@@ -49,7 +49,7 @@ xlab = {};
 
 jt_error_all = struct(); 
 % For each joint 
-mns =[]; stds = []; 
+mns =[]; stds = []; rms = []; 
 
 for j=1:length(jts)
     newjt = strrep(jts{j},' ','_');
@@ -98,6 +98,7 @@ for j=1:length(jts)
     xoff = xoff + 1;
 
     mns =[mns, mean(jt_error)]; stds = [stds, circStd(jt_error)]; 
+    rms = [rms, sqrt(mean(jt_error.^2)) ]; 
 
     
 end
@@ -108,10 +109,14 @@ ylim([-30, 30])
 title('Within session reliability (7 hands, 4 subjects)')
 ylabel('Degrees'); 
 
+disp('Within session reliability (7 hands, 4 subjects)')
 disp('Mean error: ')
 disp(mean(mns))
 disp('mean std: ')
 disp(mean(stds))
+disp('RMS: ')
+disp(mean(rms))
+
 
 %saveas(f, 'figs/w_in_session_precision.epsc')
 
@@ -411,6 +416,8 @@ figure; hold all
 xoff = 1;
 xlab = {};
 
+global_diffs = []; 
+
 for j=1:length(jts)
     newjt = strrep(jts{j},' ','_');
     [angles,~] = jt_angle_list(jts{j});
@@ -449,6 +456,8 @@ for j=1:length(jts)
     xlab{end+1} = jt_names{j}; 
     xoff = xoff + 1;
     
+    global_diffs = [global_diffs jt_error_xsess]; 
+
 end
 
 xticks(1:xoff);
@@ -457,6 +466,11 @@ xtickangle(90);
 ylim([-30, 30])
 ylabel('Degrees')
 title('X subject reliability (7 hands, 4 subjects)')
+
+rms_ = sqrt(mean(global_diffs.^2)); 
+fprintf('Mean x session/subj reliability: %.3f, Std: %.3f, RMS: %.3f ', mean(global_diffs), std(global_diffs), mean(rms_))
+
+
 
 f = gcf; 
 %saveas(f, 'figs/x_session_precision_dmn.epsc')
@@ -864,6 +878,7 @@ xlab = {};
 
 mns = []; 
 stds = []; 
+rms = []; 
 
 for i_j = 1:length(jts)
     newjt = strrep(jts{i_j},' ','_');
@@ -888,6 +903,7 @@ for i_j = 1:length(jts)
 
         mns = [mns, circMean(errs_d)]; 
         stds = [stds, circStd(errs_d)]; 
+        rms = [rms, sqrt(mean(errs_d.^2))]; 
     end
 end
 
@@ -895,6 +911,9 @@ disp('Mean: ')
 disp(circMean(mns))
 disp('Stds: ')
 disp(circMean(stds))
+disp('RMS: ')
+disp(mean(rms))
+
 
 subplot(1, 2, 1); 
 xticks(1:tru_cnt)
