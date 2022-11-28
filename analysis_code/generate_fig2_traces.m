@@ -35,7 +35,7 @@ Filename = string(strcat(path_to_data,'data', slash, 'tom_data',slash,'jt_angle_
 load ([Filename]);
 [u_height,unaffect_all,data_palm,u_time] = jt_angle_split('un',unaffected,angle_struct,input1);
 [healthy_output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm, u_height, input1,sign,'un','off');  %does inerpolation and plotting
-    
+     
 
 % Load data from each subject
 for i_s = 1:length(patient_subject)
