@@ -30,6 +30,7 @@ for n = 1:10
     %st_2_pi is rounded because ginput selects decimal values 
     trial_lengths(n) = round(st_2_pi{n}(2,1))-round(st_2_pi{n}(1,1)); 
 end
+fs_save = 1/mean(diff(u_time{1})); 
 
 % Edited PK on 10/20/22 -- changed all trial lengths to 100 after doing
 % simulations to show effects of "N" on MSE/ROM
@@ -123,6 +124,7 @@ for m = 1:12
 end
 
 
+fprintf('Fs saved: %.3f\n', fs_save)
 if any(convertCharsToStrings(hand) == "un")
     unaf.u = u; % un z-scored trial
     unaf.u_ind = ind;
@@ -134,6 +136,7 @@ if any(convertCharsToStrings(hand) == "un")
     unaf.zsc_std = sigma; % zscore parameters 
     unaf.mtl = mtl; %median trial length from start to end of pinch task 
     unaf.raw = u_raw; % un z-scored uninterpolated trial 
+    unaf.trial_length_ts = trial_lengths/fs_save; 
     output = unaf;
     
 elseif any(convertCharsToStrings(hand) == "aff")
@@ -147,6 +150,8 @@ elseif any(convertCharsToStrings(hand) == "aff")
     affe.zsc_std = sigma; % zscore parameters 
     affe.mtl = mtl; %median trial length from start to end of pinch task 
     affe.raw = u_raw; % un z-scored uninterpolated trial 
+    affe.trial_length_ts = trial_lengths/fs_save; 
+    affe.fs = fs_save; 
     output = affe;
 end
 
