@@ -33,6 +33,7 @@ datatable = {};
 % Column 5 -- [mse_min, mse, mse_max]; (array) 
 % Column 6 -- [rom_min, rom, rom_max]; (array) 
 
+trl_tms = []; 
 
 %% Load data from each subject
 for i_s = 1:length(subject)
@@ -80,6 +81,8 @@ for i_s = 1:length(subject)
         end
         
     end
+    
+    trl_tms = [trl_tms, output.trial_length_ts]; 
     
     [mse_rom] = calc_mse_rom(path_to_data,slash,output,input1,'un'); %calculates below variables
    
@@ -191,3 +194,12 @@ ylabel('Angle Variation during Task (4*std=95% of data)')
 xlim([0, 110])
 ylim([0, 110])
 title(["Line slope = " num2str(b1)])
+
+%% Plot for trial times 
+figure; 
+histogram(trl_tms, 'Normalization','probability'); 
+ylim([0, .3])
+xlabel('Trial Times (sec)')
+ylabel('Fraction of trials')
+set(gcf,'position',[0, 0, 400, 300])
+saveas(gcf, ['figs/trial_times.png'])
