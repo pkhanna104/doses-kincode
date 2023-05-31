@@ -41,7 +41,7 @@ baseline_fnames = {'task_baselines/av-R-baseline.mat', 'task_baselines/av-L-base
 
 path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/data/healthy_controls_goniometer/';
 
-%% Figure 1; across all sessions -- within-session reliability
+%% Supplemental Figure 1C; across all sessions -- within-session reliability
 figure('Position', [10 10 600 400]); hold all
 
 xoff = 1;
@@ -287,7 +287,7 @@ disp(mean(rms))
 % subplot(1, 2, 1); 
 % title('X session reliability (2 hands, 1 subject, 3 days)')
 
-%% Figure 3 -- X subjects -- across session var; 
+%% Supplemental Figure 1C, right -- X subjects -- across session var; 
 sessions = {'av-8-30-22-R-edited', 'av-8-30-22-L',...
     'fr-9-1-22-L', 'fr-9-1-22-R','sb-9-1-22-L','sb-9-1-22-R',...
     'pk-8-26-R'};
@@ -475,7 +475,7 @@ fprintf('Mean x session/subj reliability: %.3f, Std: %.3f, RMS: %.3f ', mean(glo
 f = gcf; 
 %saveas(f, 'figs/x_session_precision_dmn.epsc')
 
-%% Figure 4 - hysteresis plots across subjects %%
+%% Supplemental Figure 1B Left - hysteresis plots across subjects %%
 jts = {...,
     'Thumb MCP', % dot product
     'Thumb DIP', % dot product
@@ -748,7 +748,7 @@ for j = 1:length(jts)
 
 end
 
-%% Figures 5 -- error plots 
+%% Supplemental Figures 1B right -- error plots 
 
 % Figure of true and dmn errors 
 figure;%(1); % By subject 

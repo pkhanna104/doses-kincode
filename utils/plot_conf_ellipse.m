@@ -46,8 +46,8 @@ if perc_confidence == 95
 elseif perc_confidence == 90
     x_dem = std(X_unrot(:, 1))*sqrt(4.605); 
     y_dem = std(X_unrot(:, 2))*sqrt(4.605);
-    linestyle = '--';
-    linewidth = 1; 
+    linestyle = '-';
+    linewidth = .5; 
 elseif perc_confidence == 75
     x_dem = std(X_unrot(:, 1))*sqrt(2.77); 
     y_dem = std(X_unrot(:, 2))*sqrt(2.77);

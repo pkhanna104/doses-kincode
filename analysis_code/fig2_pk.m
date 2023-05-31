@@ -53,8 +53,9 @@ for i_s = 1:length(subject)
     %calculations (see function below)
     data_height_plot(data_palm,u_height, u_time,sign,input1,'un','off');
     
-    [output] = interp_raw_n_zscore(path_to_data,slash,u_time,unaffect_all,data_palm, u_height, input1,sign,'un','off',nstd);  %does inerpolation and plotting
-    
+    [output] = interp_raw_n_zscore(path_to_data,slash,u_time,...
+        unaffect_all,data_palm, u_height, input1,sign,'un','off');  %does inerpolation and plotting
+
     disp(['Subject : ' subject{i_s} ', unaff N = ' num2str(output.mtl)]); 
     % Plot 
     for m = 1:12
@@ -86,7 +87,8 @@ for i_s = 1:length(subject)
     data_height_plot(aff_data_palm,a_height, a_time,sign,input1,'aff','off');
     
     %below function same as above but for affected.  Also plots fig 6
-    [aff_output]  = interp_raw_n_zscore(path_to_data,slash,a_time,affect_all,aff_data_palm, a_height, input1, sign,'aff','off',nstd);
+    [aff_output]  = interp_raw_n_zscore(path_to_data,slash,a_time,...
+        affect_all,aff_data_palm, a_height, input1, sign,'aff','off');
     
     disp(['Subject : ' subject{i_s} ', unaff N = ' num2str(aff_output.mtl)]);
 
@@ -176,19 +178,21 @@ roms = struct();
 rom_all = []; 
 for jt = 1 : 11
     
-    if jt <= 5 % fine 
-        figure(1); hold all; 
-        cat = 'fine'; 
-    elseif jt <= 9 % med
-        figure(2); hold all; 
-        cat = 'med'; 
-    else % gross 
-        figure(3); hold all;
-        cat = 'gross'; 
-    end
-    %figure(jt); hold all; 
+%     if jt <= 5 % fine 
+%         figure(1); hold all; 
+%         cat = 'fine'; 
+%     elseif jt <= 9 % med
+%         figure(2); hold all; 
+%         cat = 'med'; 
+%     else % gross 
+%         figure(3); hold all;
+%         cat = 'gross'; 
+%     end
+    figure(jt); hold all; 
     
     jt_rom = []; 
+    norm_rom = []; 
+    norm_mse = []; 
 
     for i = 1:length(datatable)
         
@@ -210,30 +214,49 @@ for jt = 1 : 11
             mse = datatable{i}{5}; 
             id = 'ctrl_R'; 
             jt_rom = [jt_rom 4*rm(2)]; % 2*jt rom 
-
+            norm_rom = [norm_rom rm(2)]; 
+            norm_mse = [norm_mse mse(2)]; 
         elseif datatable{i}{2} == 1 && datatable{i}{3} == jt && datatable{i}{4} == 1
-            col = [.5, .5, .5]; 
+            col = 'k'; 
             rm = datatable{i}{6}; 
             mse = datatable{i}{5}; 
             id = 'ctrl_L'; 
+            norm_rom = [norm_rom rm(2)]; 
+            norm_mse = [norm_mse mse(2)]; 
         end
         
         if ~isempty(rm)
             plot(rm(2), mse(2), '.', 'MarkerSize', 20, 'Color', col); 
-            plot([rm(1), rm(3)], [mse(2), mse(2)], '-', 'Color', col); 
-            plot([rm(2), rm(2)], [mse(1), mse(3)], '-', 'Color', col); 
-            text(rm(2), mse(2), datatable{i}{1}{1}, 'FontSize', 10)
+            %plot([rm(1), rm(3)], [mse(2), mse(2)], '-', 'Color', col); 
+            %plot([rm(2), rm(2)], [mse(1), mse(3)], '-', 'Color', col); 
+            if col == 'r'
+                if contains(datatable{i}{1}{1}, 'B8M')
+                    plt = true; n = 3; 
+                elseif contains(datatable{i}{1}, 'S13J')
+                    plt = true; n = 4; 
+                elseif contains(datatable{i}{1}, 'B12J')
+                    plt = true; n = 4; 
+                else
+                    plt = false; 
+                end
+                if plt
+                    text(rm(2)-2, mse(2), datatable{i}{1}{1}(1:n), 'FontSize', 14)
+                end
+            end
         end
-        
-
 
     end
+    
+    mn_rom = mean(norm_rom); 
+    mn_mse = mean(norm_mse); 
+    scatter(mn_rom, mn_mse, 100, 'k', 'filled', 's', 'MarkerFaceAlpha', .5)
+    
     title(jt_names{jt})
     
     rom_all = [rom_all mean(jt_rom)]; 
-    %xlim([0, 35])
-    %ylim([0, 2])
-    %set(gcf,'position',[0, 0, 1000, 1000])
+    xlim([0, 20])
+    ylim([0, 1.2])
+    set(gcf,'position',[0, 0, 300, 300])
     %saveas(figure(jt), ['figs/' jt_names{jt} '_mse_vs_rom.png'])
 end
 

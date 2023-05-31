@@ -136,7 +136,8 @@ for i_s = 1:length(subject)
         if m == 12 
             disp('Skipping Shoulder roll')
         elseif and(contains(subject{i_s}, 'R15J'), contains(jt_names{m}, 'Index_DIP'))
-            disp('Skipping R15J DIP')
+            % Only add unaffected 
+            datatable{end+1} = {subject(i_s), ctrl,     m,  0, u_MSE, u_ROM}; 
         else
             %%% Save everything out
             %                            1      2       3    4    5         6

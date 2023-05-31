@@ -1,6 +1,7 @@
 %% Initialize
 clear;clc;close all;
 
+%%
 if ismac % Preeya computer
     path_to_data = '/Users/preeyakhanna/Dropbox/Ganguly_Lab/Projects/HP_Sensorized_Object/doses-kincode/';
     slash = '/'; 
@@ -16,13 +17,32 @@ patient_subject = {'B8M', 'B12J', 'S13J_small'};
 % jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...
 %     'Elbow_Flex', 'Palm_Abd', 'Palm_Flex', 'Palm_Prono', 'Shoulder_HorzFlex',...
 %     'Shoulder_VertFlex'}; 
-jts_ids = [5, 6, 10];
-jt_nms = {'Index DIP', 'Elbow Flex/Ext', 'Shoulder Abd/Add'}; 
+
+%%% Index DIP 
+%jts_ids = [7, 6, 10];
+%jt_nms = {'Palm Abd/Add', 'Elbow Flex/Ext', 'Shoulder Abd/Add'}; 
+
+% jts_ids = [1, 2, 3, 4, 5]; 
+% jt_nms = {'thumb mcp', 'thumb dip', 'index mcp', 'index pip', 'index dip'}; 
+% 
+
+jts_ids = [2, 6, 10];
+jt_nms = {'Thumb DIP', 'Elbow Flex/Ext', 'Shoulder Abd/Add'}; 
+
+
 %jt_cols = {[237, 32, 36]/256, [118, 172, 66]/256, [127, 47, 141]/256}; % R/G/purple
 %jt_cols = {[123,50,148],[166,219,160],[0,136,55]}; 
-jt_cols = {[123,50,148],[147, 193, 139],[0,136,55]}; 
+%jt_cols = {[123,50,148],[147, 193, 139],[0,136,55]}; 
+% light purple, light green, green 
+%jt_cols = {[178,144,195],[147, 193, 139],[0,136,55]};
+%jt_cols = {[178,144,195], [178,144,195], [178,144,195], [178,144,195], [178,144,195]}; 
 
-ylims = {[-10, 50], [-10, 50], [-60, 20]}; 
+% dark purple light green, green 
+jt_cols = {[123,50,148], [147, 193, 139],[0,136,55]};
+
+%ylims = {[-30, 40], [-10, 50], [-60, 20]}; 
+%ylims = {[-10, 30], [-10, 30], [-10, 50], [-10, 50], [-10, 50]}; 
+ylims = {[-10, 35], [-10, 50], [-60, 20]}; 
 
 % Load healthy subject data 
 Filename = strcat('FR_ctrl', '_pinch_data.mat'); 
@@ -82,7 +102,13 @@ for i_s = 1:length(patient_subject)
 
 
         for trl = 1:10
-            
+
+
+            % Un-zscored healthy 
+            jt_trl2 = cell2mat(healthy_output.u(trl, jt)); 
+            jt_trl2 = jt_trl2 - jt_trl2(1); 
+            plot(jt_trl2, 'Color', [.2, .2, .2], 'LineWidth',.35)
+
             % Un-zscored trial
             jt_trl = cell2mat(aff_output.a(trl, jt)); 
             jt_trl = jt_trl - jt_trl(1); 
@@ -92,13 +118,8 @@ for i_s = 1:length(patient_subject)
                 jt_trl = -1*jt_trl; 
             end
 
-            plot(jt_trl, 'Color', jt_cols{jt_i}/256, 'LineWidth',.25)
+            plot(jt_trl, 'Color', jt_cols{jt_i}/256, 'LineWidth',.35)
 
-            % Un-zscored healthy 
-            jt_trl2 = cell2mat(healthy_output.u(trl, jt)); 
-            jt_trl2 = jt_trl2 - jt_trl2(1); 
-            plot(jt_trl2, 'Color', [.2, .2, .2], 'LineWidth',.25)
-            
         end
         
         % Title 
@@ -117,7 +138,7 @@ for jt_i = 1:length(jts_ids)
     jtnm = jt_nms{jt_i}; 
     jtnm2 = strrep(jtnm, '/', '_');
     jtnm2 = strrep(jtnm2, ' ', '_');
-    saveas(figure(jt), ['figs/' jtnm2 '_fig2_traces.svg'])
+    %saveas(figure(jt), ['figs/' jtnm2 '_fig2_traces.svg'])
 end
 
 

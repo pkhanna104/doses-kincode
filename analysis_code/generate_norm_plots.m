@@ -22,7 +22,9 @@ load('data/datatable_boot_acc_samp_prec.mat')
 %colors_p = {[237, 32, 36], [28, 117, 188] [118, 172, 66], [127, 47, 141]}; % R/B/G/purple
 %colors_p = {[189,201,225], [103,169,207], [28,144,153], [1,108,89]}
 %colors_p = {[179,205,227],[140,150,198]*.8, [136,86,250],[121,15,124]}; % purples
-colors_p = {[123,50,148],[194,165,207],[166,219,160],[0,136,55]}; 
+
+%colors_p = {[123,50,148],[194,165,207],[166,219,160],[0,136,55]}; 
+colors_p = {[123,50,148],[178,144,195],[166,219,160],[0,136,55]}; 
 
 
 %% Get out mse_norm and rom_norm
@@ -92,7 +94,7 @@ ix1 = find(id_==1); % affected
 ix2 = find(id_==2); %unaffected
 ix3 = find(id_==3); % ctrls 
 
-%% Plot 1 -- only mean, by joint category
+%% Plot Fig 2E --  by joint category
 figure; hold all; 
 ax = subplot(1,1,1); 
 
@@ -130,7 +132,7 @@ for i=1:11
     ix_jt2 = find(jt_(ix2) == i); 
     ix_jt3 = find(jt_(ix3) == i); 
     
-    % Affected (red) 
+    % Affected (by jt category) 
     n = length(ix_jt1); 
     scatter(rom_norm(ix1(ix_jt1), 2), mse_norm(ix1(ix_jt1), 2), 50, repmat(colors_p{c}/256, [n, 1]), 'filled', 'MarkerFaceAlpha', .5);
 
@@ -186,9 +188,9 @@ ylabel('Norm T2TV')
 xlim([-1, 4])
 ylim([-1, 4])
 set(gcf, 'Position', [0, 0, 400, 400])
-saveas(gcf, ['figs/normROMvMSE_byJtCat.svg'])
+%saveas(gcf, ['figs/normROMvMSE_byJtCat.svg'])
 
-%% Plot 2 -- affected/unaffected plus ellipse 
+%% Plot 2D -- affected/unaffected plus ellipse 
 figure; hold all; 
 ax = subplot(1,1,1); 
 blue = [100, 148, 165]/256; 
@@ -220,16 +222,46 @@ plot(rom_norm(ix3, 2), mse_norm(ix3, 2), 'k.', 'MarkerSize',15)
 xlabel('Norm ROM'); xlim([-1, 4])
 ylabel('Norm T2TV'); ylim([-1, 4])
 set(gcf, 'Position', [0, 0, 300, 300])
-saveas(gcf, ['figs/normROMvMSE_wAffUnaffCtrl.svg'])
 
-%% Plot 2.5 -- normal / patients for individual joints
+
+%
+rom_low = prctile(rom_norm(ix3, 2), 2.5); 
+rom_hi = prctile(rom_norm(ix3, 2), 97.5);
+
+t2t_low = prctile(mse_norm(ix3, 2), 2.5);
+t2t_hi = prctile(mse_norm(ix3, 2), 97.5);
+
+plot([rom_low, rom_low], [-1, 3], 'g-', 'linewidth', 3)
+plot([rom_hi, rom_hi], [-1, 3], 'g-', 'linewidth', 3)
+plot([-1, 3], [t2t_low, t2t_low], 'g-', 'linewidth', 3)
+plot([-1, 3], [t2t_hi, t2t_hi], 'g-', 'linewidth', 3)
+
+%saveas(gcf, ['figs/normROMvMSE_wAffUnaffCtrl.svg'])
+
+%% Plot 2C -- individual jts for normal % patients
 close all; 
-jts_ids = [5, 6, 10]; % from generate_fig2
-jt_nms = {'Index DIP', 'Elbow Flex/Ext', 'Shoulder Abd/Add'}; 
+%jts_ids = [7, 6, 10]; % from generate_fig2
+%jt_nms = {'Palm Abd/Add', 'Elbow Flex/Ext', 'Shoulder Abd/Add'}; 
+
+% jts_ids = [1, 2, 3, 4, 5]; 
+% jt_nms = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP'}; 
+
+% jts_ids = [7, 8, 9]; 
+% jt_nms = {'Palm_Abd', 'Palm_Flex', 'Palm_Prono'}; 
+% 
+%jts_ids = [1, 2, 3, 4, 5]; 
+%jt_nms = {'thumb mcp', 'thumb dip', 'index mcp', 'index pip', 'index dip'}; 
+
+jts_ids = [2, 6, 10];
+jt_nms = {'Thumb DIP', 'Elbow Flex/Ext', 'Shoulder Abd/Add'}; 
 
 %jt_cols = {[237, 32, 36], [118, 172, 66], [127, 47, 141]}; % R/G/purple
 %jt_cols = {[123,50,148],[166,219,160],[0,136,55]}; 
+
+%jt_cols = {colors_p{2}, colors_p{3}, colors_p{4}}; 
+%jt_cols = {colors_p{1}, colors_p{1}, colors_p{1}, colors_p{1}, colors_p{1}}; 
 jt_cols = {colors_p{1}, colors_p{3}, colors_p{4}}; 
+
 subjects = {'B8M', 'B12J', 'S13J'}; 
 
 for i_j = 1:length(jts_ids)
@@ -266,11 +298,11 @@ for i_j = 1:length(jts_ids)
     title(jt_nms{i_j})
     xlabel('Norm. ROM')
     ylabel('Norm. T2TV')
-    saveas(figure(i_j), ['figs/jt_id' num2str(jts_ids(i_j)) '_normROMvMSE.svg'])
+    %saveas(figure(i_j), ['figs/jt_id' num2str(jts_ids(i_j)) '_normROMvMSE.svg'])
 
 end
 
-%% Plot 3 -- Median values for normal, borderline, abnormal points
+%% Plot -- Median values for normal, borderline, abnormal points
 % inside or outside the ellipse 
 close all; 
 ax = gca; 
@@ -397,7 +429,7 @@ for met = 1:2
     ylim([0, 4]); 
 end
 
-%% Plot 3.5 -- plot normROM vs. normMSE w/ ERROR bars 
+%% Plot normROM vs. normMSE w/ ERROR bars 
 figure; hold all; 
 ax = subplot(1,1,1); 
 
@@ -427,9 +459,9 @@ plot(rom_norm(ix3, 2), mse_norm(ix3, 2), 'k.', 'MarkerSize',15)
 xlabel('Norm ROM'); xlim([-1, 4])
 ylabel('Norm T2TV'); ylim([-1, 4])
 set(gcf, 'Position', [0, 0, 400, 400])
-saveas(gcf, ['figs/normROMvMSE_wAffUnaffCtrl_werror.svg'])
+%saveas(gcf, ['figs/normROMvMSE_wAffUnaffCtrl_werror.svg'])
 
-%% Plot 3.75 -- distributions of ROM and MSE ERROR bars 
+%% Plot Supplemental Figure S4 -- distributions of ROM and MSE ERROR bars 
 rom_lt_gt = []; % 2 x N of LT / GT 
 mse_lt_gt = []; % 2 x N of LT / GT 
 
@@ -465,10 +497,10 @@ for m=1:2
     end
     
     set(gcf, 'Position', [0, 0, 800, 300])
-    saveas(gcf, ['figs/CI_dist_' mts_lab{m} '.svg'])
+    %saveas(gcf, ['figs/CI_dist_' mts_lab{m} '.svg'])
 end
 
-%% Plot 4 -- plot out violin plot distr of normROM / normMSE vs control
+%% Plot 2F -- plot out violin plot distr of normROM / normMSE vs control
 figure; 
 
 % doing this to avoid needing to index by ix1 (bc already done in

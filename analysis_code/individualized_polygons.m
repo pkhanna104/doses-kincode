@@ -112,6 +112,9 @@ close all;
 %% Subject specific 
 subjects = unique(subj_nm); 
 jt_id_order = [1:5, 7:9, 6, 10:11];  % distal // wrist // elbow // shoulder 
+% jt_names = {'Thumb_MCP', 'Thumb_DIP', 'Index_MCP', 'Index_PIP', 'Index_DIP',...
+%     'Elbow_Flex', 'Palm_Abd', 'Palm_Flex', 'Palm_Prono', 'Shoulder_HorzFlex',...
+%     'Shoulder_VertFlex'}; 
 
 % black --> copper (0 --> 2)
 colormap2 = copper(256); 
@@ -209,7 +212,7 @@ for i_s = 1:length(subjects)
         colorbar()
         
         set(figure(i_s), 'Position', [0, 0, 300, 300])
-        saveas(gcf, ['figs/indplot' subjects{i_s} '.svg'])
+        %saveas(gcf, ['figs/indplot' subjects{i_s} '.svg'])
     end
 end
 
